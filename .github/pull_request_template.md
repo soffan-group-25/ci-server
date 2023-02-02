@@ -6,7 +6,7 @@
         fix
 -   [ ] If your PR adds a feature or fix it also needs to add or modify at least
         one test
--   [ ] All code in your PR needs to have been formatted by `clang-format`
+-   [ ] All code in your PR needs to have been formatted.
 -   [ ] The merge commit title should follow our commit prefix convention of
         either "feat", "fix", "doc", or "refactor"
 -   [ ] The merge commit body should reference at least one issue

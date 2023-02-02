@@ -8,11 +8,11 @@ The task is to create a continus integration server, the Canvas page can be foun
 
 ### Building
 
-`./graldew build`
+`./gradlew build`
 
 ### Testing
 
-`./graldew test`
+`./gradlew test`
 
 ### Running
 

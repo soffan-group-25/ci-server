@@ -24,6 +24,7 @@ dependencies {
     implementation("com.google.guava:guava:31.1-jre")
     implementation("org.eclipse.jetty:jetty-servlet:9.4.6.v20170531")
     implementation("javax.servlet:javax.servlet-api:3.1.0")
+    implementation("com.google.code.gson:gson:2.10.1")
 }
 
 application {

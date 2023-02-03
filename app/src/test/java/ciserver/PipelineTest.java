@@ -13,8 +13,9 @@ public class PipelineTest {
     @Test
     public void canExecutePipeline() {
         var event = new PushEvent();
-        var pipeline = new Pipeline(event, "../pipeline"); // The relative directory is in the app folder, use `..` to
-                                                           // go up
+
+        // The relative directory is in the app folder, use `..` to go up
+        var pipeline = new Pipeline(event, "../pipeline");
         assertNotNull(pipeline);
 
         // Cannot test this since the `pull` function requires file system and network

@@ -12,17 +12,20 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
-class TestObject {
-    public Integer thing;
-    public String other;
-}
-
-/**
- * Skeleton of a ContinuousIntegrationServer which acts as webhook
- * See the Jetty documentation for API documentation of those classes.
- */
 public class ContinuousIntegrationServer extends AbstractHandler {
+    Gson gson = new Gson();
+
+    private void handlePushEvent(PushEvent event) {
+        System.err.printf("%s, %s", event.ref, event.headCommit.url);
+
+        // Here you do all the continuous integration tasks
+        // For example:
+        // 1st clone your repository
+        // 2nd compile the code
+    }
+
     public void handle(String target,
             Request baseRequest,
             HttpServletRequest request,
@@ -32,27 +35,24 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
 
+        var eventType = request.getHeader("X-GitHub-Event");
         var body = request.getReader().lines().collect(Collectors.joining());
-        System.out.println(target);
 
-        // Print JSON body (as a string)
-        // System.out.printf("%s\n", body);
-
-        // Show that json parsing is possible
-        Gson gson = new Gson();
-        var obj = gson.fromJson(body, TestObject.class);
-        System.out.printf("%d\n", obj.thing);
-        System.out.printf("%s\n", obj.other);
-
-        // here you do all the continuous integration tasks
-        // for example
-        // 1st clone your repository
-        // 2nd compile the code
+        try {
+            switch (eventType) {
+                case "push":
+                    handlePushEvent(gson.fromJson(body, PushEvent.class));
+                    break;
+                default: // Unimplemented, simply ignore
+            }
+        } catch (JsonSyntaxException e) {
+            System.err.printf("There was an error parsing the JSON for event of type %s\n", eventType);
+        }
 
         response.getWriter().println("CI job done");
     }
 
-    // used to start the CI server in command line
+    // Used to start the CI server in command line
     public static void startServer() throws Exception {
         Server server = new Server(8080);
         server.setHandler(new ContinuousIntegrationServer());

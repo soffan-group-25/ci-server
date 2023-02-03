@@ -1,7 +1,8 @@
 package ciserver;
 
 enum PipelineStatus {
-	OK,
+	Ok,
+	NotImplemented,
 	NotStarted,
 	InProgress
 }
@@ -27,21 +28,21 @@ class Pipeline {
 		// This will do for now.
 
 		var status = pull();
-		if (status != PipelineStatus.OK) {
+		if (status != PipelineStatus.Ok) {
 			return status;
 		}
 
 		status = lint();
-		if (status != PipelineStatus.OK) {
+		if (status != PipelineStatus.Ok) {
 			return status;
 		}
 
 		status = compile();
-		if (status != PipelineStatus.OK) {
+		if (status != PipelineStatus.Ok) {
 			return status;
 		}
 
-		return PipelineStatus.OK;
+		return PipelineStatus.Ok;
 	}
 
 	/**
@@ -57,14 +58,14 @@ class Pipeline {
 	}
 
 	private PipelineStatus pull() {
-		return PipelineStatus.OK;
+		return PipelineStatus.NotImplemented;
 	}
 
 	private PipelineStatus lint() {
-		return PipelineStatus.OK;
+		return PipelineStatus.NotImplemented;
 	}
 
 	private PipelineStatus compile() {
-		return PipelineStatus.OK;
+		return PipelineStatus.NotImplemented;
 	}
 }

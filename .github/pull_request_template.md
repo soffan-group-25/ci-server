@@ -8,6 +8,6 @@
         one test
 -   [ ] All code in your PR needs to have been formatted
 -   [ ] The merge commit title should follow our commit prefix convention of
-        either "feat", "fix", "doc", or "refactor"
+        either "feat", "fix", "chore", "doc", or "refactor"
 -   [ ] The merge commit body should reference at least one issue
 -   [ ] The code compiles and all the tests pass

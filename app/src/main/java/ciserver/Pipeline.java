@@ -1,17 +1,5 @@
 package ciserver;
 
-import java.util.ArrayList;
-
-// Steal from https://github.com/soffan-group-25/ci-server/pull/27
-class Commit {
-	String id;
-	String url;
-
-	ArrayList<String> added; // added files
-	ArrayList<String> removed; // removed files
-	ArrayList<String> modified; // modified files
-}
-
 enum PipelineStatus {
 	OK,
 	NotStarted,

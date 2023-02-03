@@ -9,8 +9,8 @@ import static org.junit.Assert.*;
 public class PipelineTest {
     @Test
     public void canExecutePipeline() {
-        var commit = new Commit();
-        var pipeline = new Pipeline(commit, "./pipeline");
+        var event = new PushEvent();
+        var pipeline = new Pipeline(event, "./pipeline");
         assertNotNull(pipeline);
 
         var status = pipeline.start();

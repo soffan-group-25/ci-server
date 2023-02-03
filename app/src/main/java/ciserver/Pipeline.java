@@ -2,6 +2,7 @@ package ciserver;
 
 enum PipelineStatus {
 	Ok,
+	Fail,
 	NotImplemented,
 	NotStarted,
 	InProgress

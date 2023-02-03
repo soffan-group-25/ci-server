@@ -85,10 +85,10 @@ class PipelineInstance {
  * Main Pipeline object which creates PipelineInstances.
  */
 public class Pipeline {
-	String pipelineFile; // Which directory to store pipeline data
+	String pipelineDir; // Which directory to store pipeline data
 
-	Pipeline(String pipelineFile) {
-		this.pipelineFile = pipelineFile;
+	Pipeline(String pipelineDir) {
+		this.pipelineDir = pipelineDir;
 	}
 
 	/**

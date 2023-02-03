@@ -72,7 +72,7 @@ class Pipeline {
 	 * https://github.com/centic9/jgit-cookbook/blob/master/src/main/java/org/dstadler/jgit/unfinished/PullRemoteRepository.java
 	 * Can only pull from public repositories.
 	 * 
-	 * @return
+	 * @return the status of the pull action
 	 */
 	private PipelineStatus pull() {
 		// Use the head_commit id as name for the repository directory

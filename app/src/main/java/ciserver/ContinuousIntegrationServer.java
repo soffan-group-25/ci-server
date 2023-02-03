@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.eclipse.jetty.server.Server;
@@ -15,6 +16,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 public class ContinuousIntegrationServer extends AbstractHandler {
+
     Gson gson = new Gson();
 
     private void handlePushEvent(PushEvent event) {
@@ -35,18 +37,26 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
 
-        var eventType = request.getHeader("X-GitHub-Event");
+        var eventType = Optional.ofNullable(request.getHeader("X-GitHub-Event"));
         var body = request.getReader().lines().collect(Collectors.joining());
 
         try {
-            switch (eventType) {
+            if (!eventType.isPresent()) {
+                throw new Exception("'X-GitHub-Event' header is not present.");
+            }
+
+            switch (eventType.get()) {
                 case "push":
+                    System.out.println(body);
                     handlePushEvent(gson.fromJson(body, PushEvent.class));
                     break;
                 default: // Unimplemented, simply ignore
             }
+
         } catch (JsonSyntaxException e) {
-            System.err.printf("There was an error parsing the JSON for event of type %s\n", eventType);
+            System.err.printf("There was an error parsing the JSON for event of type %s\n", eventType.get());
+        } catch (Exception e) {
+            System.err.println(e);
         }
 
         response.getWriter().println("CI job done");

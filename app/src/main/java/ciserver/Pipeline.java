@@ -10,14 +10,14 @@ enum PipelineStatus {
  * A PipelineInstance is responsible for the whole CI-pipeline
  * for a specific commit.
  */
-class PipelineInstance {
+class Pipeline {
+	String pipelineDir;
 	Commit commit;
-	Pipeline pipeline; // Parent pipeline
 	PipelineStatus status;
 
-	PipelineInstance(Commit commit, Pipeline pipeline) {
+	Pipeline(Commit commit, String pipelineDir) {
 		this.commit = commit;
-		this.pipeline = pipeline;
+		this.pipelineDir = pipelineDir;
 		this.status = PipelineStatus.NotStarted;
 	}
 
@@ -66,26 +66,5 @@ class PipelineInstance {
 
 	private PipelineStatus compile() {
 		return PipelineStatus.OK;
-	}
-}
-
-/**
- * Main Pipeline object which creates PipelineInstances.
- */
-public class Pipeline {
-	String pipelineDir; // Which directory to store pipeline data
-
-	Pipeline(String pipelineDir) {
-		this.pipelineDir = pipelineDir;
-	}
-
-	/**
-	 * Create new PipelineInstance
-	 * 
-	 * @param commit the commit to be worked on
-	 * @return the pipeline instance
-	 */
-	public PipelineInstance create(Commit commit) {
-		return new PipelineInstance(commit, this);
 	}
 }

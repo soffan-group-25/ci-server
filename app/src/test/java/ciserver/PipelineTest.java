@@ -9,13 +9,11 @@ import static org.junit.Assert.*;
 public class PipelineTest {
     @Test
     public void canExecutePipeline() {
-        var pipeline = new Pipeline("./pipeline");
         var commit = new Commit();
+        var pipeline = new Pipeline(commit, "./pipeline");
+        assertNotNull(pipeline);
 
-        var instance = pipeline.create(commit);
-        assertNotNull(instance);
-
-        var status = instance.start();
+        var status = pipeline.start();
         assertNotNull(status);
     }
 }

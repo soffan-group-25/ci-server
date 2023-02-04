@@ -18,6 +18,7 @@ import com.google.gson.JsonSyntaxException;
 public class ContinuousIntegrationServer extends AbstractHandler {
 
     Gson gson = new Gson();
+    final String GH_ACCESS_TOKEN = System.getenv("GH_ACCESS_TOKEN");
 
     private void handlePushEvent(PushEvent event) {
         System.err.printf("%s, %s", event.ref, event.headCommit.url);
@@ -30,8 +31,8 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         // Build the response according to the pipeline's return status (dummy variables
         // used here as we have no "real" requests to start the pipeline with yet).
         String[] repo_details = event.repository.full_name.split("/");
-        PipelineUpdateRequest pr = new PipelineUpdateRequest(repo_details[0], repo_details[1], event.headCommit.id, "token",
-                CommitStatus.SUCCESS, "", "Test passed!", "ci", null);
+        PipelineUpdateRequest pr = new PipelineUpdateRequest(repo_details[0], repo_details[1], event.headCommit.id,
+                GH_ACCESS_TOKEN, CommitStatus.SUCCESS, "", "Test passed!", "ci", null);
 
         try {
             int res = pr.send();

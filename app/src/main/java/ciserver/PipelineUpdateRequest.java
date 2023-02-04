@@ -78,7 +78,7 @@ public class PipelineUpdateRequest {
                         + "/statuses/" + this.path.sha))
                 .POST(HttpRequest.BodyPublishers.ofString(request_body))
                 .header("Accept", "application/vnd.github+json")
-                .header("Authorization", "Bearer: " + this.auth_tkn)
+                .header("Authorization", "Bearer " + this.auth_tkn)
                 .header("X-GitHub-Api-Version", API_VERSION)
                 .build();
 

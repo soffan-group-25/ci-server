@@ -20,22 +20,16 @@ enum PipelineStatus {
  * for a specific commit.
  */
 class Pipeline {
-	final String pipelineDir;
-	final PushEvent event;
-	PipelineStatus status;
 
-	Pipeline(PushEvent event, String pipelineDir) {
-		this.event = event;
-		this.pipelineDir = pipelineDir;
-		this.status = PipelineStatus.NotStarted;
-	}
+	/**
+	 * Start the pipeline.
+	 *
+	 * @return the status of the executed pipeline. OK if everything went ok.
+	 */
+	public static PipelineStatus start(PushEvent event, String pipelineDir) {
+		String directoryPath = String.format("%s/repositories/%s", pipelineDir, event.headCommit.id);
 
-	private PipelineStatus _start() {
-		// The following pipeline process could
-		// be refactored into something more ergonomic and elegant.
-		// This will do for now.
-
-		var status = pull();
+		var status = pull(event, directoryPath);
 		if (status != PipelineStatus.Ok) {
 			return status;
 		}
@@ -54,30 +48,16 @@ class Pipeline {
 	}
 
 	/**
-	 * Start the pipeline.
-	 * 
-	 * @return the status of the executed pipeline. OK if everything went ok.
-	 */
-	public PipelineStatus start() {
-		this.status = PipelineStatus.InProgress;
-		this.status = _start();
-
-		return this.status;
-	}
-
-	/**
 	 * Pulls the repository and checks out the head_commit
-	 * 
+	 *
 	 * Inspiration from:
 	 * https://github.com/centic9/jgit-cookbook/blob/master/src/main/java/org/dstadler/jgit/unfinished/PullRemoteRepository.java
 	 * Can only pull from public repositories.
-	 * 
+	 *
 	 * @return the status of the pull action
 	 */
-	private PipelineStatus pull() {
+	private static PipelineStatus pull(PushEvent event, String directoryPath) {
 		// Use the head_commit id as name for the repository directory
-		String directoryPath = String.format("%s/repositories/%s", pipelineDir, event.headCommit.id);
-
 		try {
 			File directory = new File(directoryPath);
 			directory.mkdirs(); // Make the directories recursively
@@ -103,11 +83,11 @@ class Pipeline {
 		return PipelineStatus.Ok;
 	}
 
-	private PipelineStatus lint() {
+	private static PipelineStatus lint() {
 		return PipelineStatus.NotImplemented;
 	}
 
-	private PipelineStatus compile() {
+	private static PipelineStatus compile() {
 		return PipelineStatus.NotImplemented;
 	}
 }

@@ -15,6 +15,7 @@ import org.junit.Test;
 import com.google.gson.Gson;
 
 public class PipelinePullerTest {
+
     @Test
     public void canPull() throws IOException {
         var gson = new Gson();
@@ -26,7 +27,7 @@ public class PipelinePullerTest {
         assertEquals(status, PipelineStatus.Ok);
 
         File directory = new File(
-                String.format("%s/repositories/%s", PipelineTest.PipelineTestingDirectory, event.headCommit.id));
+                String.format("%s/%s/%s", PipelineTest.PipelineTestingDirectory, event.repository.name, event.headCommit.id));
         assertTrue(directory.isDirectory());
 
         try {

@@ -11,7 +11,7 @@ enum PipelineStatus {
 	InProgress
 }
 
-interface PipelineComponent {
+interface PipelineStage {
 	public PipelineStatus execute(String pipelineDir, PushEvent event);
 }
 
@@ -20,9 +20,6 @@ interface PipelineComponent {
  * for a specific commit.
  */
 class Pipeline {
-	final String pipelineDir;
-	final PushEvent event;
-	PipelineStatus status;
 
 	/*
 	 * Continue with PipelineLinter, PipelineCompiler
@@ -30,7 +27,9 @@ class Pipeline {
 	 * As one can individually test the pull, lint, compile functionality,
 	 * without having a bunch of public methods in the Pipeline class.
 	 */
-	ArrayList<PipelineComponent> components = new ArrayList<>();
+	private ArrayList<PipelineStage> stages = new ArrayList<>();
+	private final String pipelineDir;
+	private final PushEvent event;
 
 	Pipeline(PushEvent event, String pipelineDir) {
 		this.event = event;
@@ -38,19 +37,24 @@ class Pipeline {
 	}
 
 	/**
-	 * Add components to the Pipeline.
-	 * 
-	 * @param components the components to add
+	 * Add stages to the Pipeline.
+	 *
+	 * @param stages the stages to add
 	 * @return the pipeline
 	 */
-	public Pipeline withComponent(PipelineComponent... components) {
-		this.components.addAll(Arrays.asList(components));
+	public Pipeline withComponent(PipelineStage... stages) {
+		this.stages.addAll(Arrays.asList(stages));
 
 		return this;
 	}
 
-	private PipelineStatus _start() {
-		for (var component : components) {
+	/**
+	 * Start the pipeline with the added stages.
+	 *
+	 * @return the status of the pipeline execution
+	 */
+	public PipelineStatus start() {
+		for (var component : stages) {
 			var status = component.execute(pipelineDir, event);
 			if (status != PipelineStatus.Ok) {
 				return status;
@@ -58,17 +62,5 @@ class Pipeline {
 		}
 
 		return PipelineStatus.Ok;
-	}
-
-	/**
-	 * Start the pipeline with the added components.
-	 * 
-	 * @return the status of the pipeline execution
-	 */
-	public PipelineStatus start() {
-		this.status = PipelineStatus.InProgress;
-		this.status = _start();
-
-		return this.status;
 	}
 }

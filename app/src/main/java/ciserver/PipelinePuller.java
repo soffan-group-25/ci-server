@@ -7,19 +7,20 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-public class PipelinePuller implements PipelineComponent {
+public class PipelinePuller implements PipelineStage {
+
 	/**
 	 * Pulls the repository and checks out the head_commit
-	 * 
+	 *
 	 * Inspiration from:
 	 * https://github.com/centic9/jgit-cookbook/blob/master/src/main/java/org/dstadler/jgit/unfinished/PullRemoteRepository.java
 	 * Can only pull from public repositories.
-	 * 
+	 *
 	 * @return the status of the pull action
 	 */
 	public PipelineStatus execute(String pipelineDir, PushEvent event) {
 		// Use the head_commit id as name for the repository directory
-		String directoryPath = String.format("%s/repositories/%s", pipelineDir, event.headCommit.id);
+		String directoryPath = String.format("%s/%s/%s", pipelineDir, event.repository.name, event.headCommit.id);
 
 		try {
 			File directory = new File(directoryPath);

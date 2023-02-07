@@ -3,38 +3,17 @@
  */
 package ciserver;
 
-import org.junit.Test;
-
-import com.google.gson.Gson;
-
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 public class PipelineTest {
     @Test
-    public void canExecutePipeline() {
+    public void canCreatePipeline() {
         var event = new PushEvent();
 
         // The relative directory is in the app folder, use `..` to go up
         var pipeline = new Pipeline(event, "../pipeline");
         assertNotNull(pipeline);
-
-        // Cannot test this since the `pull` function requires file system and network
-        // access.
-        // var status = pipeline.start();
-        // assertNotNull(status);
-    }
-
-    @Test
-    public void canPull() {
-        var gson = new Gson();
-        var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
-        var pipeline = new Pipeline(event, "../pipeline");
-
-        /*
-         * Unsure how to properly test the pull capability of the pipeline,
-         * since it requires pulling from an outside repository.
-         */
-        // var status = pipeline.start();
-        // assertNotNull(status);
     }
 }

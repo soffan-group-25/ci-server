@@ -2,8 +2,12 @@ package ciserver;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jetty.http.MetaData.Response;
+import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -15,6 +19,42 @@ enum PipelineStatus {
 	InProgress
 }
 
+// class PullExecutor {
+// public PipelineStatus execute(String[] commands) {
+// // Execute commands
+// return PipelineStatus.Ok;
+// }
+// }
+
+// class PullExecutorTester extends PullExecutor {
+// String[] savedCommands = {};
+
+// @Override
+// public PipelineStatus execute(String[] commands) {
+// // Save commands for comparing testing
+// savedCommands = commands;
+// return PipelineStatus.Ok;
+// }
+// }
+
+// class PipelinePull {
+// final PullExecutor executor;
+
+// PipelinePull(PullExecutor executor) {
+// this.executor = executor;
+// }
+
+// public PipelineStatus pull(String directoryPath) {
+// String[] commands = {"git clone blabla"};
+
+// return executor.execute(commands);
+// }
+// }
+
+interface PipelineComponent {
+	public PipelineStatus execute(String pipelineDir, PushEvent event);
+}
+
 /**
  * A PipelineInstance is responsible for the whole CI-pipeline
  * for a specific commit.
@@ -24,90 +64,51 @@ class Pipeline {
 	final PushEvent event;
 	PipelineStatus status;
 
+	/*
+	 * Continue with PipelineLinter, PipelineCompiler
+	 * Reason for this abstraction is easier testability,
+	 * As one can individually test the pull, lint, compile functionality,
+	 * without having a bunch of public methods in the Pipeline class.
+	 */
+	ArrayList<PipelineComponent> components = new ArrayList<>();
+
 	Pipeline(PushEvent event, String pipelineDir) {
 		this.event = event;
 		this.pipelineDir = pipelineDir;
-		this.status = PipelineStatus.NotStarted;
+	}
+
+	/**
+	 * Add components to the Pipeline.
+	 * 
+	 * @param components the components to add
+	 * @return the pipeline
+	 */
+	public Pipeline withComponent(PipelineComponent... components) {
+		this.components.addAll(Arrays.asList(components));
+
+		return this;
 	}
 
 	private PipelineStatus _start() {
-		// The following pipeline process could
-		// be refactored into something more ergonomic and elegant.
-		// This will do for now.
-
-		var status = pull();
-		if (status != PipelineStatus.Ok) {
-			return status;
-		}
-
-		status = lint();
-		if (status != PipelineStatus.Ok) {
-			return status;
-		}
-
-		status = compile();
-		if (status != PipelineStatus.Ok) {
-			return status;
+		for (var component : components) {
+			var status = component.execute(pipelineDir, event);
+			if (status != PipelineStatus.Ok) {
+				return status;
+			}
 		}
 
 		return PipelineStatus.Ok;
 	}
 
 	/**
-	 * Start the pipeline.
+	 * Start the pipeline with the added components.
 	 * 
-	 * @return the status of the executed pipeline. OK if everything went ok.
+	 * @return the status of the pipeline execution
 	 */
 	public PipelineStatus start() {
 		this.status = PipelineStatus.InProgress;
 		this.status = _start();
 
 		return this.status;
-	}
-
-	/**
-	 * Pulls the repository and checks out the head_commit
-	 * 
-	 * Inspiration from:
-	 * https://github.com/centic9/jgit-cookbook/blob/master/src/main/java/org/dstadler/jgit/unfinished/PullRemoteRepository.java
-	 * Can only pull from public repositories.
-	 * 
-	 * @return the status of the pull action
-	 */
-	private PipelineStatus pull() {
-		// Use the head_commit id as name for the repository directory
-		String directoryPath = String.format("%s/repositories/%s", pipelineDir, event.headCommit.id);
-
-		try {
-			File directory = new File(directoryPath);
-			directory.mkdirs(); // Make the directories recursively
-			FileUtils.deleteDirectory(directory); // If there already is a repository, delete it
-
-			Git.cloneRepository()
-					.setURI(event.repository.cloneUrl)
-					.setDirectory(directory)
-					.setBranch(event.ref)
-					.call() // Clone the repository
-					.checkout()
-					.setName(event.headCommit.id)
-					.call(); // Checkout the commit
-
-		} catch (GitAPIException e) {
-			e.printStackTrace();
-			return PipelineStatus.Fail;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return PipelineStatus.Fail;
-		}
-
-		return PipelineStatus.Ok;
-	}
-
-	private PipelineStatus lint() {
-		return PipelineStatus.NotImplemented;
-	}
-
-	private PipelineStatus compile() {
-		return PipelineStatus.NotImplemented;
 	}
 }

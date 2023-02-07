@@ -16,13 +16,11 @@ public class PipelineCompiler implements PipelineComponent {
 	}
 
 	/**
-	 * Pulls the repository and checks out the head_commit
+	 * Run the specified `commands` in the folder of the pulled repository.
 	 * 
-	 * Inspiration from:
-	 * https://github.com/centic9/jgit-cookbook/blob/master/src/main/java/org/dstadler/jgit/unfinished/PullRemoteRepository.java
-	 * Can only pull from public repositories.
+	 * Note: the PipelinePull component or a similar action must be run before this.
 	 * 
-	 * @return the status of the pull action
+	 * @return the status of the compilation action
 	 */
 	public PipelineStatus execute(String pipelineDir, PushEvent event) {
 		var path = String.format("%s/repositories/%s", pipelineDir, event.headCommit.id);

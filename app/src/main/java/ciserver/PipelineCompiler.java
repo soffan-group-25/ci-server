@@ -3,10 +3,18 @@ package ciserver;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 
 public class PipelineCompiler implements PipelineComponent {
+	public final ArrayList<String> commands = new ArrayList<>();
+
+	PipelineCompiler(String... commands) {
+		this.commands.addAll(Arrays.asList(commands));
+	}
+
 	/**
 	 * Pulls the repository and checks out the head_commit
 	 * 
@@ -22,7 +30,7 @@ public class PipelineCompiler implements PipelineComponent {
 		directory.mkdirs(); // Make the directories recursively
 
 		try {
-			var process = new ProcessBuilder("sh", "gradlew", "build")
+			var process = new ProcessBuilder(commands)
 					.directory(directory)
 					.redirectErrorStream(true)
 					.start();

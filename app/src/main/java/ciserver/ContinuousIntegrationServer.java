@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
 import java.io.IOException;
+import java.net.http.HttpResponse;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,9 +36,9 @@ public class ContinuousIntegrationServer extends AbstractHandler {
                 GH_ACCESS_TOKEN, CommitStatus.SUCCESS, "", "Test passed!", "ci", null);
 
         try {
-            int res = pr.send();
+            HttpResponse<String> res = pr.send();
 
-            if (res != 201) {
+            if (res.statusCode() != 201) {
                 System.err.println("HTTP POST error: " + res);
             }
         } catch (Exception e) {

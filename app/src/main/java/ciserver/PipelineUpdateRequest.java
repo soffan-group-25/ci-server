@@ -97,9 +97,9 @@ public class PipelineUpdateRequest {
      * PipelineUpdateRequest path,
      * containing information about the success status of a certain build.
      *
-     * @return the HTTP status code of the response.
+     * @return the HTTP response formatted as a String.
      **/
-    public int send() throws InterruptedException, IOException {
+    public HttpResponse<String> send() throws InterruptedException, IOException {
         Gson gson = new Gson();
         String request_body = gson.toJson(this.body);
 
@@ -117,6 +117,6 @@ public class PipelineUpdateRequest {
         // May throw InterruptedException or IOException.
         // Note that it does NOT throw on bad status codes, only internal errors.
         HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString());
-        return resp.statusCode();
+        return resp;
     }
 }

@@ -1,15 +1,7 @@
 package ciserver;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import org.apache.commons.io.FileUtils;
-import org.eclipse.jetty.http.MetaData.Response;
-import org.eclipse.jgit.api.CloneCommand;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 
 enum PipelineStatus {
 	Ok,
@@ -18,38 +10,6 @@ enum PipelineStatus {
 	NotStarted,
 	InProgress
 }
-
-// class PullExecutor {
-// public PipelineStatus execute(String[] commands) {
-// // Execute commands
-// return PipelineStatus.Ok;
-// }
-// }
-
-// class PullExecutorTester extends PullExecutor {
-// String[] savedCommands = {};
-
-// @Override
-// public PipelineStatus execute(String[] commands) {
-// // Save commands for comparing testing
-// savedCommands = commands;
-// return PipelineStatus.Ok;
-// }
-// }
-
-// class PipelinePull {
-// final PullExecutor executor;
-
-// PipelinePull(PullExecutor executor) {
-// this.executor = executor;
-// }
-
-// public PipelineStatus pull(String directoryPath) {
-// String[] commands = {"git clone blabla"};
-
-// return executor.execute(commands);
-// }
-// }
 
 interface PipelineComponent {
 	public PipelineStatus execute(String pipelineDir, PushEvent event);

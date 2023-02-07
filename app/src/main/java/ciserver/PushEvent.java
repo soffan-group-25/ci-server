@@ -29,6 +29,9 @@ class Commit {
 	ArrayList<String> modified; // modified files
 }
 
+/**
+ * This class represents the relevant information from a Push Event to GitHub
+ */
 public class PushEvent {
 	String ref; // hold branch name
 	String compare; // link to see changes

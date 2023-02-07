@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.junit.Test;
 
@@ -15,25 +16,26 @@ import com.google.gson.Gson;
 
 public class PipelinePullerTest {
     @Test
-    public void canPull() {
+    public void canPull() throws IOException {
         var gson = new Gson();
-        var pipelineDir = "../pipeline";
         var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
-        var pipeline = new Pipeline(event, pipelineDir)
+        var pipeline = new Pipeline(event, PipelineTest.PipelineTestingDirectory)
                 .withComponent(new PipelinePuller());
 
         var status = pipeline.start();
         assertEquals(status, PipelineStatus.Ok);
 
-        File directory = new File(String.format("%s/repositories/%s", pipelineDir, event.headCommit.id));
+        File directory = new File(
+                String.format("%s/repositories/%s", PipelineTest.PipelineTestingDirectory, event.headCommit.id));
         assertTrue(directory.isDirectory());
 
         try {
             var repo = Git.open(directory);
-
             assertEquals(event.headCommit.id, repo.getRepository().getBranch());
         } catch (IOException e) {
             assertTrue("Could not open git project", false);
+        } finally {
+            FileUtils.deleteDirectory(directory);
         }
     }
 }

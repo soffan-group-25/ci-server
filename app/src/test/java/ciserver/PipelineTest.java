@@ -8,6 +8,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 public class PipelineTest {
+    public static final String PipelineTestingDirectory = "../pipeline_testing";
+
     @Test
     public void canCreatePipeline() {
         var event = new PushEvent();

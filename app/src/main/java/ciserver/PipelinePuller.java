@@ -20,6 +20,10 @@ public class PipelinePuller implements StageTask {
      * https://github.com/centic9/jgit-cookbook/blob/master/src/main/java/org/dstadler/jgit/unfinished/PullRemoteRepository.java
      * Can only pull from public repositories.
      *
+     * @param pipelineDir the (grand)parent directory to run the commands in
+     * @param event       specifies a subdirectory based on the repo name and head
+     *                    commit id
+     *
      * @return the status of the pull action
      */
     public PipelineStatus execute(String pipelineDir, PushEvent event) {

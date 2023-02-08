@@ -46,12 +46,17 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         }
     }
 
+    private PipelineStatus executePipeline(PushEvent event, Pipeline pipeline, PipelineObserver observer) {
+        pipeline.addObserver(observer);
+        return pipeline.start(TargetStage.ALL);
+
+    }
+
     private void handlePushEvent(PushEvent event) {
         System.err.printf("%s, %s", event.ref, event.headCommit.url);
 
-        // 1st do ci work
         var pipeline = new Pipeline(event, "../pipeline");
-        pipeline.addObserver(new PipelineObserver() {
+        var status = executePipeline(event, pipeline, new PipelineObserver() {
             @Override
             public void update(TargetStage stage, PipelineStatus status) {
                 System.err.printf("\tRunning stage: %s: %s\n", stage, status);
@@ -63,7 +68,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
             }
         });
 
-        var status = pipeline.start(TargetStage.ALL);
         if (status == PipelineStatus.Ok) {
             sendUpdateRequest(event, CommitStatus.SUCCESS, "Pipeline succeeded", null);
         }

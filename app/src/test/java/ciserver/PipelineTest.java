@@ -18,7 +18,7 @@ public class PipelineTest {
         var gson = new Gson();
         var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
 
-        var pipeline = new Pipeline(event, "./pipeline");
+        var pipeline = new Pipeline(event, PipelineTestingDirectory);
         assertNotNull(pipeline);
 
         var status = pipeline.start(TargetStage.ALL);
@@ -30,7 +30,7 @@ public class PipelineTest {
         var gson = new Gson();
         var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
 
-        var pipeline = new Pipeline(event, "./pipeline");
+        var pipeline = new Pipeline(event, PipelineTestingDirectory);
         var pipelineObserver = new PipelineObserver() {
 
             boolean observerIsNotified = false;

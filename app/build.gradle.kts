@@ -19,6 +19,7 @@ repositories {
 dependencies {
     // Use JUnit test framework.
     testImplementation("junit:junit:4.13.2")
+    testImplementation("com.github.tomakehurst:wiremock-jre8:2.35.0")
 
     // This dependency is used by the application.
     implementation("com.google.guava:guava:31.1-jre")

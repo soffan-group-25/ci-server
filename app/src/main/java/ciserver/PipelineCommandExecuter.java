@@ -8,10 +8,10 @@ import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 
-public class PipelineCompiler implements StageTask {
+public class PipelineCommandExecuter implements StageTask {
 	public final ArrayList<String> commands = new ArrayList<>();
 
-	PipelineCompiler(String... commands) {
+	PipelineCommandExecuter(String... commands) {
 		this.commands.addAll(Arrays.asList(commands));
 	}
 

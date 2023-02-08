@@ -132,6 +132,13 @@ public class PipelineUpdateRequest {
      * containing information about the success status of a certain build.
      *
      * @return the HTTP response formatted as a String.
+     *
+     * @throws InterruptedException {@link java.net.http.HttpClient#send(HttpRequest, HttpResponse.BodyHandler)
+     *                              if the operation is interrupted}
+     * @throws IOException          {@link java.net.http.HttpClient#send(HttpRequest, HttpResponse.BodyHandler)
+     *                              if an I/O error occurs when sending or
+     *                              receiving}
+     *
      **/
     public HttpResponse<String> send() throws InterruptedException, IOException {
         Gson gson = new Gson();

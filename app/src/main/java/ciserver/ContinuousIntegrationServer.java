@@ -16,6 +16,11 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+/**
+ * This class is the core class for running the CI server.
+ * The CI server compiles and tests Java code with Gradle, and can set commit
+ * statuses in GitHub
+ */
 public class ContinuousIntegrationServer extends AbstractHandler {
 
     private final Gson gson = new Gson();
@@ -50,6 +55,13 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         System.out.println("Commit status update sent successfully.");
     }
 
+    /**
+     * Handle an HTTP request to the CI server. See
+     * <a
+     * href=https://www.eclipse.org/jetty/javadoc/jetty-9/org/eclipse/jetty/server/handler/AbstractHandler.html#handle(java.lang.String,org.eclipse.jetty.server.Request,javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)>documentation
+     * of the parent interface</a>
+     * {@inheritDoc}
+     */
     public void handle(String target,
             Request baseRequest,
             HttpServletRequest request,
@@ -84,7 +96,11 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         response.getWriter().println("CI job done");
     }
 
-    // Used to start the CI server in command line
+    /**
+     * Used to start the CI server in command line
+     * 
+     * @throws Exception if the server cannot be started
+     */
     public static void startServer() throws Exception {
         Server server = new Server(8080);
         server.setHandler(new ContinuousIntegrationServer());

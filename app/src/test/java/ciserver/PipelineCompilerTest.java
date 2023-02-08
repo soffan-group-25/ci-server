@@ -29,14 +29,15 @@ public class PipelineCompilerTest {
         var fileName = "test_file.txt";
         var gson = new Gson();
         var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
-        var pipeline = new Pipeline(event, PipelineTest.PipelineTestingDirectory)
-                .withComponent(new PipelinePuller(), new PipelineCompiler("touch", fileName));
+        var pipeline = new Pipeline(event, PipelineTest.PipelineTestingDirectory);
+        pipeline.compiler = new PipelineCompiler("touch", fileName);
 
-        var status = pipeline.start();
+        var status = pipeline.start(Target.COMPILE);
         assertEquals(status, PipelineStatus.Ok);
 
         File directory = new File(
-                String.format("%s/repositories/%s", PipelineTest.PipelineTestingDirectory, event.headCommit.id));
+                String.format("%s/repositories/%s", PipelineTest.PipelineTestingDirectory,
+                        event.headCommit.id));
         assertTrue(directory.isDirectory());
 
         var fileExists = Arrays.stream(directory.listFiles())

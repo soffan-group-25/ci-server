@@ -30,6 +30,7 @@ class Pipeline {
 	private final PushEvent event;
 
 	PipelinePuller puller = new PipelinePuller();
+	PipelineCompiler compiler = new PipelineCompiler("./gradlew build");
 
 	Pipeline(PushEvent event, String pipelineDir) {
 		this.event = event;
@@ -80,11 +81,11 @@ class Pipeline {
 	}
 
 	private PipelineStatus lint() {
-		return PipelineStatus.NotImplemented;
+		return PipelineStatus.Ok;
 	}
 
 	private PipelineStatus compile() {
-		return PipelineStatus.NotImplemented;
+		return compiler.execute(pipelineDir, event);
 	}
 
 	private PipelineStatus test() {

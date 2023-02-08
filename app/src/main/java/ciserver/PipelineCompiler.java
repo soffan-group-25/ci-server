@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 
-public class PipelineCompiler implements PipelineComponent {
+public class PipelineCompiler implements PipelineStage {
 	public final ArrayList<String> commands = new ArrayList<>();
 
 	PipelineCompiler(String... commands) {

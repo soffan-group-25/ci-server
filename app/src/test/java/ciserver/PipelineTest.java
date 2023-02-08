@@ -6,15 +6,14 @@ package ciserver;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.io.File;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.junit.Test;
 
 import com.google.gson.Gson;
-
-import java.io.File;
-import java.util.Arrays;
 
 public class PipelineTest {
 

@@ -8,6 +8,9 @@ import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 
+/**
+ * this class is used for the compile stage of our CI pipeline
+ */
 public class PipelineCommandExecuter implements StageTask {
 	public final ArrayList<String> commands = new ArrayList<>();
 
@@ -27,15 +30,15 @@ public class PipelineCommandExecuter implements StageTask {
 		var directory = new File(path);
 		directory.mkdirs(); // Make the directories recursively
 
-		try {
-			var process = new ProcessBuilder(commands)
-					.directory(directory)
-					.redirectErrorStream(true)
-					.start();
+        try {
+            var process = new ProcessBuilder(commands)
+                    .directory(directory)
+                    .redirectErrorStream(true)
+                    .start();
 
-			// Here we have access to the output of the build, which we can send to GitHub.
-			String output = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
-			System.err.println(output);
+            // Here we have access to the output of the build, which we can send to GitHub.
+            String output = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
+            System.err.println(output);
 
 			int status = process.waitFor();
 			if (status != 0) {
@@ -49,6 +52,6 @@ public class PipelineCommandExecuter implements StageTask {
 			return PipelineStatus.Fail;
 		}
 
-		return PipelineStatus.Ok;
-	}
+        return PipelineStatus.Ok;
+    }
 }

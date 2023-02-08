@@ -8,11 +8,21 @@ enum PipelineStatus {
 	InProgress
 }
 
+enum Target {
+	PULL,
+	LINT,
+	COMPILE,
+	TESTING,
+	NOTIFICATION,
+	ALL
+}
+
 /**
  * A PipelineInstance is responsible for the whole CI-pipeline
  * for a specific commit.
  */
 class Pipeline {
+
 	String pipelineDir;
 	Commit commit;
 	PipelineStatus status;
@@ -23,39 +33,44 @@ class Pipeline {
 		this.status = PipelineStatus.NotStarted;
 	}
 
-	private PipelineStatus _start() {
-		// The following pipeline process could
-		// be refactored into something more ergonomic and elegant.
-		// This will do for now.
+	/**
+	 * Start the pipeline.
+	 *
+	 * @return the status of the executed pipeline. OK if everything went ok.
+	 */
+	public PipelineStatus start(Target target) {
 
+		// Pull
 		var status = pull();
-		if (status != PipelineStatus.Ok) {
+		if (status != PipelineStatus.Ok || target == Target.PULL) {
 			return status;
 		}
 
+		// Lint
 		status = lint();
-		if (status != PipelineStatus.Ok) {
+		if (status != PipelineStatus.Ok || target == Target.LINT) {
 			return status;
 		}
 
+		// Compile
 		status = compile();
-		if (status != PipelineStatus.Ok) {
+		if (status != PipelineStatus.Ok || target == Target.COMPILE) {
+			return status;
+		}
+
+		// Test
+		status = test();
+		if (status != PipelineStatus.Ok || target == Target.TESTING) {
+			return status;
+		}
+
+		// Notify
+		status = nootify();
+		if (status != PipelineStatus.Ok || target == Target.NOTIFICATION) {
 			return status;
 		}
 
 		return PipelineStatus.Ok;
-	}
-
-	/**
-	 * Start the pipeline.
-	 * 
-	 * @return the status of the executed pipeline. OK if everything went ok.
-	 */
-	public PipelineStatus start() {
-		this.status = PipelineStatus.InProgress;
-		this.status = _start();
-
-		return this.status;
 	}
 
 	private PipelineStatus pull() {
@@ -67,6 +82,15 @@ class Pipeline {
 	}
 
 	private PipelineStatus compile() {
+		return PipelineStatus.NotImplemented;
+	}
+
+	private PipelineStatus test() {
+		return PipelineStatus.NotImplemented;
+	}
+
+	// "notify" conflicts with Object.notify(). Think of Pingu instead! Noot noot!
+	private PipelineStatus nootify() {
 		return PipelineStatus.NotImplemented;
 	}
 }

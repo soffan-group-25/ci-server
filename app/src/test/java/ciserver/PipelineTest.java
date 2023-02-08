@@ -13,7 +13,7 @@ public class PipelineTest {
         var pipeline = new Pipeline(commit, "./pipeline");
         assertNotNull(pipeline);
 
-        var status = pipeline.start();
+        var status = pipeline.start(Target.ALL);
         assertNotNull(status);
     }
 }

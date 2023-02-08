@@ -7,15 +7,43 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.google.gson.Gson;
+
 public class PipelineTest {
+
     public static final String PipelineTestingDirectory = "../pipeline_testing";
 
     @Test
-    public void canCreatePipeline() {
-        var event = new PushEvent();
+    public void canExecutePipeline() {
+        var gson = new Gson();
+        var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
 
-        // The relative directory is in the app folder, use `..` to go up
-        var pipeline = new Pipeline(event, "../pipeline");
+        var pipeline = new Pipeline(event, "./pipeline");
         assertNotNull(pipeline);
+
+        var status = pipeline.start(TargetStage.ALL);
+        assertNotNull(status);
+    }
+
+    @Test
+    public void pipelineObserverIsNotified() {
+        var gson = new Gson();
+        var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
+
+        var pipeline = new Pipeline(event, "./pipeline");
+        var pipelineObserver = new PipelineObserver() {
+
+            boolean observerIsNotified = false;
+
+            @Override
+            public void update(TargetStage stage, PipelineStatus status) {
+                observerIsNotified = true;
+            }
+        };
+
+        pipeline.addObserver(pipelineObserver);
+        pipeline.start(TargetStage.ALL);
+
+        assertTrue(pipelineObserver.observerIsNotified);
     }
 }

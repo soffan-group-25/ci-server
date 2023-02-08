@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 
-public class PipelineCompiler implements TargetStage {
+public class PipelineCompiler implements StageTask {
 	public final ArrayList<String> commands = new ArrayList<>();
 
 	PipelineCompiler(String... commands) {
@@ -17,9 +17,9 @@ public class PipelineCompiler implements TargetStage {
 
 	/**
 	 * Run the specified `commands` in the folder of the pulled repository.
-	 * 
+	 *
 	 * Note: the PipelinePull component or a similar action must be run before this.
-	 * 
+	 *
 	 * @return the status of the compilation action
 	 */
 	public PipelineStatus execute(String pipelineDir, PushEvent event) {

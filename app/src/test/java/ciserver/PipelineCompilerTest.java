@@ -19,9 +19,9 @@ public class PipelineCompilerTest {
      * Test the compiling capabilities of the `PipelineCompiler` component.`
      * The test is done by executing a simple `touch` command to see if it has any
      * effect in the folder.
-     * 
+     *
      * Note that this test requires that `PipelinePuller works`.
-     * 
+     *
      * @throws IOException
      */
     @Test
@@ -32,8 +32,8 @@ public class PipelineCompilerTest {
         var pipeline = new Pipeline(event, PipelineTest.PipelineTestingDirectory);
         pipeline.compiler = new PipelineCompiler("touch", fileName);
 
-        var status = pipeline.start(Target.COMPILE);
-        assertEquals(status, PipelineStatus.Ok);
+        var status = pipeline.start(TargetStage.COMPILE);
+        assertEquals(PipelineStatus.Ok, status);
 
         File directory = new File(
                 String.format("%s/repositories/%s", PipelineTest.PipelineTestingDirectory,

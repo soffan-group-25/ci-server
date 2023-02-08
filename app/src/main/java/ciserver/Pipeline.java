@@ -38,7 +38,6 @@ class Pipeline {
 	private List<PipelineObserver> observers = new ArrayList<PipelineObserver>();
 	PipelinePuller puller = new PipelinePuller();
 	PipelineCompiler compiler = new PipelineCompiler("/bin/sh", "gradlew", "build", "-x", "test");
-	PipelineCompiler tester = new PipelineCompiler("/bin/sh", "gradlew", "test");
 
 	Pipeline(PushEvent event, String pipelineDir) {
 		this.event = event;
@@ -92,11 +91,8 @@ class Pipeline {
 
 	private PipelineStatus lint() {
 		notifyObservers(TargetStage.LINT, PipelineStatus.InProgress);
-		var status = PipelineStatus.Ok;
 
-		// Code goes here
-
-		return status;
+		return PipelineStatus.Ok; // todo: implement linting
 	}
 
 	private PipelineStatus compile() {
@@ -108,7 +104,7 @@ class Pipeline {
 	private PipelineStatus test() {
 		notifyObservers(TargetStage.TESTING, PipelineStatus.InProgress);
 
-		return tester.execute(pipelineDir, event);
+		return PipelineStatus.Ok; // todo: implement testing
 	}
 
 	public void addObserver(PipelineObserver observer) {

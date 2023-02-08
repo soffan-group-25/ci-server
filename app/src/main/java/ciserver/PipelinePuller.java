@@ -7,7 +7,7 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-public class PipelinePuller implements PipelineStage {
+public class PipelinePuller implements TargetStage {
 
 	/**
 	 * Pulls the repository and checks out the head_commit

@@ -17,7 +17,7 @@ enum Target {
 	ALL
 }
 
-interface PipelineStage {
+interface TargetStage {
 	public PipelineStatus execute(String pipelineDir, PushEvent event);
 }
 

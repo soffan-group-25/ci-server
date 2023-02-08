@@ -30,7 +30,12 @@ class Commit {
 }
 
 /**
- * This class represents the relevant information from a Push Event to GitHub
+ * This class represents the relevant information from a Push Event to GitHub.
+ *
+ * All fields are set up to match the "push" event http request JSON data from
+ * GitHub so that it can be parsed with the gson library. See <a
+ * href=https://docs.github.com/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push>the
+ * documentation on GitHub</a>
  */
 public class PushEvent {
     String ref; // hold branch name

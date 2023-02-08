@@ -3,6 +3,7 @@ package ciserver;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.NoSuchElementException;
 
@@ -42,16 +43,14 @@ public class PipelineUpdateRequestTest {
     }
 
     @Test
-    public void TestInvalidToken(){
+    public void TestInvalidToken() throws InterruptedException, IOException {
         PipelineUpdateRequest pr = new PipelineUpdateRequest("soffan-group-25", "ci-server", "123abc", "token",
                 CommitStatus.SUCCESS, "www.learn-more-about.this-build.com", "Test passed!", "ci", null);
 
-        try {
         HttpResponse<String> resp = pr.send();
         // API response code for "bad credentials"
-        assert(resp.statusCode() == 401);
+        assert (resp.statusCode() == 401);
         // "message": "Bad credentials"
-        assert(resp.body().contains("Bad credentials"));
-        } catch (Exception e) {}
+        assert (resp.body().contains("Bad credentials"));
     }
 }

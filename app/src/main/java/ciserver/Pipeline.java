@@ -16,7 +16,6 @@ enum TargetStage {
 	LINT,
 	COMPILE,
 	TESTING,
-	NOTIFICATION,
 	ALL
 }
 
@@ -38,7 +37,7 @@ class Pipeline {
 	private final PushEvent event;
 	private List<PipelineObserver> observers = new ArrayList<PipelineObserver>();
 	PipelinePuller puller = new PipelinePuller();
-	PipelineCompiler compiler = new PipelineCompiler("./gradlew build");
+	PipelineCompiler compiler = new PipelineCompiler("/bin/sh", "gradlew", "build", "-x", "test");
 
 	Pipeline(PushEvent event, String pipelineDir) {
 		this.event = event;
@@ -81,62 +80,31 @@ class Pipeline {
 			return status;
 		}
 
-		// Notify
-		status = nootify();
-		notifyObservers(TargetStage.NOTIFICATION, status);
-		if (status != PipelineStatus.Ok || target == TargetStage.NOTIFICATION) {
-			return status;
-		}
-
 		return PipelineStatus.Ok;
 	}
 
 	private PipelineStatus pull() {
 		notifyObservers(TargetStage.PULL, PipelineStatus.InProgress);
-		var status = PipelineStatus.NotImplemented;
 
-		// Code goes here
-		status = puller.execute(pipelineDir, event);
-
-		return status;
+		return puller.execute(pipelineDir, event);
 	}
 
 	private PipelineStatus lint() {
 		notifyObservers(TargetStage.LINT, PipelineStatus.InProgress);
-		var status = PipelineStatus.Ok;
 
-		// Code goes here
-
-		return status;
+		return PipelineStatus.Ok; // todo: implement linting
 	}
 
 	private PipelineStatus compile() {
 		notifyObservers(TargetStage.COMPILE, PipelineStatus.InProgress);
-		var status = PipelineStatus.NotImplemented;
 
-		// Code goes here
-		status = compiler.execute(pipelineDir, event);
-
-		return status;
+		return compiler.execute(pipelineDir, event);
 	}
 
 	private PipelineStatus test() {
-		notifyObservers(TargetStage.NOTIFICATION, PipelineStatus.InProgress);
-		var status = PipelineStatus.NotImplemented;
+		notifyObservers(TargetStage.TESTING, PipelineStatus.InProgress);
 
-		// Code goes here
-
-		return status;
-	}
-
-	// "notify" conflicts with Object.notify(). Think of Pingu instead! Noot noot!
-	private PipelineStatus nootify() {
-		notifyObservers(TargetStage.NOTIFICATION, PipelineStatus.InProgress);
-		var status = PipelineStatus.NotImplemented;
-
-		// Code goes here
-
-		return status;
+		return PipelineStatus.Ok; // todo: implement testing
 	}
 
 	public void addObserver(PipelineObserver observer) {

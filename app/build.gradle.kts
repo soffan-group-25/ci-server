@@ -34,3 +34,12 @@ application {
     // Define the main class for the application.
     mainClass.set("ciserver.App")
 }
+
+tasks.withType<Jar> {
+    manifest { attributes["Main-Class"] = "ciserver.App" }
+
+    val dependencies =
+            configurations.runtimeClasspath.get().map(::zipTree) // OR .map { zipTree(it) }
+    from(dependencies)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

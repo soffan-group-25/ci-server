@@ -8,22 +8,22 @@ import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 
-public class PipelineCommandExecuter implements StageTask {
+public class PipelineCompiler implements StageTask {
 	public final ArrayList<String> commands = new ArrayList<>();
 
-	PipelineCommandExecuter(String... commands) {
+	PipelineCompiler(String... commands) {
 		this.commands.addAll(Arrays.asList(commands));
 	}
 
 	/**
 	 * Run the specified `commands` in the folder of the pulled repository.
-	 * 
+	 *
 	 * Note: the PipelinePull component or a similar action must be run before this.
-	 * 
+	 *
 	 * @return the status of the compilation action
 	 */
 	public PipelineStatus execute(String pipelineDir, PushEvent event) {
-		var path = String.format("%s/%s/%s", pipelineDir, event.repository.name, event.headCommit.id);
+		var path = String.format("%s/repositories/%s", pipelineDir, event.headCommit.id);
 		var directory = new File(path);
 		directory.mkdirs(); // Make the directories recursively
 

@@ -17,28 +17,54 @@ import java.io.File;
 import java.util.Arrays;
 
 public class PipelineTest {
+
     public static final String PipelineTestingDirectory = "../pipeline_testing";
 
     @Test
-    public void canCreatePipeline() {
-        var event = new PushEvent();
+    public void canExecutePipeline() {
+        var gson = new Gson();
+        var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
 
-        // The relative directory is in the app folder, use `..` to go up
-        var pipeline = new Pipeline(event, "../pipeline");
+        var pipeline = new Pipeline(event, PipelineTestingDirectory);
         assertNotNull(pipeline);
+
+        var status = pipeline.start(TargetStage.ALL);
+        assertNotNull(status);
+    }
+
+    @Test
+    public void pipelineObserverIsNotified() {
+        var gson = new Gson();
+        var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
+
+        var pipeline = new Pipeline(event, PipelineTestingDirectory);
+        var pipelineObserver = new PipelineObserver() {
+
+            boolean observerIsNotified = false;
+
+            @Override
+            public void update(TargetStage stage, PipelineStatus status) {
+                observerIsNotified = true;
+            }
+        };
+
+        pipeline.addObserver(pipelineObserver);
+        pipeline.start(TargetStage.ALL);
+
+        assertTrue(pipelineObserver.observerIsNotified);
     }
 
     @Test
     public void canPull() throws IOException {
         var gson = new Gson();
         var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
-        var pipeline = new Pipeline(event, PipelineTest.PipelineTestingDirectory);
+        var pipeline = new Pipeline(event, PipelineTestingDirectory);
 
-        var status = pipeline.start(Target.PULL);
+        var status = pipeline.start(TargetStage.PULL);
         assertEquals(status, PipelineStatus.Ok);
 
         File directory = new File(
-                String.format("%s/%s/%s", PipelineTest.PipelineTestingDirectory, event.repository.name,
+                String.format("%s/%s/%s", PipelineTestingDirectory, event.repository.name,
                         event.headCommit.id));
         assertTrue(directory.isDirectory());
 
@@ -69,11 +95,11 @@ public class PipelineTest {
         var pipeline = new Pipeline(event, PipelineTest.PipelineTestingDirectory);
         pipeline.compiler = new PipelineCommandExecuter("touch", fileName);
 
-        var status = pipeline.start(Target.COMPILE);
+        var status = pipeline.start(TargetStage.COMPILE);
         assertEquals(status, PipelineStatus.Ok);
 
         File directory = new File(
-                String.format("%s/repositories/%s", PipelineTest.PipelineTestingDirectory,
+                String.format("%s/%s/%s", PipelineTest.PipelineTestingDirectory, event.repository.name,
                         event.headCommit.id));
         assertTrue(directory.isDirectory());
 

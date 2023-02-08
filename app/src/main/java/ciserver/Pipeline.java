@@ -1,5 +1,8 @@
 package ciserver;
 
+import java.util.ArrayList;
+import java.util.List;
+
 enum PipelineStatus {
 	Ok,
 	Fail,
@@ -8,7 +11,7 @@ enum PipelineStatus {
 	InProgress
 }
 
-enum Target {
+enum TargetStage {
 	PULL,
 	LINT,
 	COMPILE,
@@ -17,7 +20,11 @@ enum Target {
 	ALL
 }
 
-interface TargetStage {
+interface PipelineObserver {
+	public void update(TargetStage stage, PipelineStatus status);
+}
+
+interface StageTask {
 	public PipelineStatus execute(String pipelineDir, PushEvent event);
 }
 
@@ -26,9 +33,10 @@ interface TargetStage {
  * for a specific commit.
  */
 class Pipeline {
+
 	private final String pipelineDir;
 	private final PushEvent event;
-
+	private List<PipelineObserver> observers = new ArrayList<PipelineObserver>();
 	PipelinePuller puller = new PipelinePuller();
 	PipelineCommandExecuter compiler = new PipelineCommandExecuter("./gradlew build -x test");
 	PipelineCommandExecuter tester = new PipelineCommandExecuter("./gradlew test");
@@ -41,36 +49,43 @@ class Pipeline {
 	/**
 	 * Start the pipeline.
 	 *
+	 * @param target is what stage the pipeline should target.
 	 * @return the status of the executed pipeline. OK if everything went ok.
 	 */
-	public PipelineStatus start(Target target) {
+	public PipelineStatus start(TargetStage target) {
+
 		// Pull
 		var status = pull();
-		if (status != PipelineStatus.Ok || target == Target.PULL) {
+		notifyObservers(TargetStage.PULL, status);
+		if (status != PipelineStatus.Ok || target == TargetStage.PULL) {
 			return status;
 		}
 
 		// Lint
 		status = lint();
-		if (status != PipelineStatus.Ok || target == Target.LINT) {
+		notifyObservers(TargetStage.LINT, status);
+		if (status != PipelineStatus.Ok || target == TargetStage.LINT) {
 			return status;
 		}
 
 		// Compile
 		status = compile();
-		if (status != PipelineStatus.Ok || target == Target.COMPILE) {
+		notifyObservers(TargetStage.COMPILE, status);
+		if (status != PipelineStatus.Ok || target == TargetStage.COMPILE) {
 			return status;
 		}
 
 		// Test
 		status = test();
-		if (status != PipelineStatus.Ok || target == Target.TESTING) {
+		notifyObservers(TargetStage.TESTING, status);
+		if (status != PipelineStatus.Ok || target == TargetStage.TESTING) {
 			return status;
 		}
 
 		// Notify
 		status = nootify();
-		if (status != PipelineStatus.Ok || target == Target.NOTIFICATION) {
+		notifyObservers(TargetStage.NOTIFICATION, status);
+		if (status != PipelineStatus.Ok || target == TargetStage.NOTIFICATION) {
 			return status;
 		}
 
@@ -78,23 +93,64 @@ class Pipeline {
 	}
 
 	private PipelineStatus pull() {
-		return puller.execute(pipelineDir, event);
+		notifyObservers(TargetStage.PULL, PipelineStatus.InProgress);
+		var status = PipelineStatus.NotImplemented;
+
+		// Code goes here
+		status = puller.execute(pipelineDir, event);
+
+		return status;
 	}
 
 	private PipelineStatus lint() {
-		return PipelineStatus.Ok;
+		notifyObservers(TargetStage.LINT, PipelineStatus.InProgress);
+		var status = PipelineStatus.Ok;
+
+		// Code goes here
+
+		return status;
 	}
 
 	private PipelineStatus compile() {
-		return compiler.execute(pipelineDir, event);
+		notifyObservers(TargetStage.COMPILE, PipelineStatus.InProgress);
+		var status = PipelineStatus.NotImplemented;
+
+		// Code goes here
+		status = compiler.execute(pipelineDir, event);
+
+		return status;
 	}
 
 	private PipelineStatus test() {
-		return tester.execute(pipelineDir, event);
+		notifyObservers(TargetStage.NOTIFICATION, PipelineStatus.InProgress);
+		var status = PipelineStatus.NotImplemented;
+
+		status = tester.execute(pipelineDir, event);
+
+		return status;
 	}
 
 	// "notify" conflicts with Object.notify(). Think of Pingu instead! Noot noot!
 	private PipelineStatus nootify() {
-		return PipelineStatus.NotImplemented;
+		notifyObservers(TargetStage.NOTIFICATION, PipelineStatus.InProgress);
+		var status = PipelineStatus.NotImplemented;
+
+		// Code goes here
+
+		return status;
+	}
+
+	public void addObserver(PipelineObserver observer) {
+		observers.add(observer);
+	}
+
+	public void removeObserver(PipelineObserver observer) {
+		observers.remove(observer);
+	}
+
+	public void notifyObservers(TargetStage stage, PipelineStatus status) {
+		for (PipelineObserver observer : observers) {
+			observer.update(stage, status);
+		}
 	}
 }

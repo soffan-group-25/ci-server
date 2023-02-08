@@ -7,6 +7,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 enum CommitStatus {
     ERROR,
@@ -41,13 +42,15 @@ class RequestPath {
  **/
 class RequestBody {
     String state;
-    String target_url;
+
+    @SerializedName("target_url")
+    String targetUrl;
     String description;
     String context;
 
     RequestBody(String state, String url, String desc, String ctx) {
         this.state = state;
-        this.target_url = url;
+        this.targetUrl = url;
         this.description = desc;
         this.context = ctx;
     }
@@ -108,7 +111,7 @@ public class PipelineUpdateRequest {
     RequestPath path;
     RequestBody body;
     Optional<PipelineStage> failedOn;
-    String auth_tkn;
+    String authTkn;
 
     /**
      * Creates a new PipelineUpdateRequest object.
@@ -120,7 +123,7 @@ public class PipelineUpdateRequest {
         String state_str = dto.state.toString().toLowerCase();
         this.body = new RequestBody(state_str, dto.url, dto.desc, dto.ctx);
         this.failedOn = Optional.ofNullable(dto.failedOn);
-        this.auth_tkn = dto.token;
+        this.authTkn = dto.token;
     }
 
     /**
@@ -132,16 +135,16 @@ public class PipelineUpdateRequest {
      **/
     public HttpResponse<String> send() throws InterruptedException, IOException {
         Gson gson = new Gson();
-        String request_body = gson.toJson(this.body);
+        String requestBody = gson.toJson(this.body);
 
         // Build the actual request
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.github.com/repos/" + this.path.owner + "/" + this.path.repository
                         + "/statuses/" + this.path.sha))
-                .POST(HttpRequest.BodyPublishers.ofString(request_body))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .header("Accept", "application/vnd.github+json")
-                .header("Authorization", "Bearer " + this.auth_tkn)
+                .header("Authorization", "Bearer " + this.authTkn)
                 .header("X-GitHub-Api-Version", API_VERSION)
                 .build();
 

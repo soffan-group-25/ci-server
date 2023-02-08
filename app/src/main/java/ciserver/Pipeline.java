@@ -24,18 +24,23 @@ interface PipelineObserver {
 	public void update(TargetStage stage, PipelineStatus status);
 }
 
+interface TargetStage {
+	public PipelineStatus execute(String pipelineDir, PushEvent event);
+}
+
 /**
  * A PipelineInstance is responsible for the whole CI-pipeline
  * for a specific commit.
  */
 class Pipeline {
 
-	String pipelineDir;
-	Commit commit;
-	List<PipelineObserver> observers = new ArrayList<PipelineObserver>();
+	private final String pipelineDir;
+	private final PushEvent event;
+  private List<PipelineObserver> observers = new ArrayList<PipelineObserver>();
+	private PipelinePuller puller = new PipelinePuller();
 
-	Pipeline(Commit commit, String pipelineDir) {
-		this.commit = commit;
+	Pipeline(PushEvent event, String pipelineDir) {
+		this.event = event;
 		this.pipelineDir = pipelineDir;
 	}
 
@@ -50,7 +55,7 @@ class Pipeline {
 		// Pull
 		var status = pull();
 		notifyObservers(TargetStage.PULL, status);
-		if (status != PipelineStatus.Ok || target == TargetStage.PULL) {
+		if (status != PipelineStatus.Ok || target == Target.PULL) {
 			return status;
 		}
 
@@ -70,7 +75,7 @@ class Pipeline {
 
 		// Test
 		status = test();
-		notifyObservers(TargetStage.TESTING, status);
+    notifyObservers(TargetStage.TESTING, status);
 		if (status != PipelineStatus.Ok || target == TargetStage.TESTING) {
 			return status;
 		}

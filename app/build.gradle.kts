@@ -25,9 +25,21 @@ dependencies {
     implementation("org.eclipse.jetty:jetty-servlet:9.4.6.v20170531")
     implementation("javax.servlet:javax.servlet-api:3.1.0")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r")
+    implementation("org.slf4j:slf4j-log4j12:1.7.29")
+    implementation("commons-io:commons-io:2.6")
 }
 
 application {
     // Define the main class for the application.
     mainClass.set("ciserver.App")
+}
+
+tasks.withType<Jar> {
+    manifest { attributes["Main-Class"] = "ciserver.App" }
+
+    val dependencies =
+            configurations.runtimeClasspath.get().map(::zipTree) // OR .map { zipTree(it) }
+    from(dependencies)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

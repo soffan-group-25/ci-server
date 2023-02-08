@@ -3,11 +3,14 @@
  */
 package ciserver;
 
-import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 public class PipelineTest {
 
+    public static final String PipelineTestingDirectory = "../pipeline_testing";
+    
     @Test
     public void canExecutePipeline() {
         var commit = new Commit();

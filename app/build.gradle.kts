@@ -36,10 +36,18 @@ application {
 }
 
 tasks.withType<Jar> {
-    manifest { attributes["Main-Class"] = "ciserver.App" }
+    manifest {
+        attributes["Main-Class"] = "ciserver.App"
+    }
 
-    val dependencies =
-            configurations.runtimeClasspath.get().map(::zipTree) // OR .map { zipTree(it) }
+    val dependencies = configurations
+        .runtimeClasspath
+        .get()
+        .map(::zipTree) // OR .map { zipTree(it) }
     from(dependencies)
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+    exclude("META-INF/*.RSA")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+

@@ -30,7 +30,7 @@ public class PipelineCompilerTest {
         var gson = new Gson();
         var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
         var pipeline = new Pipeline(event, PipelineTest.PipelineTestingDirectory);
-        pipeline.compiler = new PipelineCompiler("touch", fileName);
+        pipeline.compiler = new PipelineCommandExecuter("touch", fileName);
 
         var status = pipeline.start(Target.COMPILE);
         assertEquals(status, PipelineStatus.Ok);

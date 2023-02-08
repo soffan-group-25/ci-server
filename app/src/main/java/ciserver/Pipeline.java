@@ -30,7 +30,8 @@ class Pipeline {
 	private final PushEvent event;
 
 	PipelinePuller puller = new PipelinePuller();
-	PipelineCompiler compiler = new PipelineCompiler("./gradlew build");
+	PipelineCommandExecuter compiler = new PipelineCommandExecuter("./gradlew build -x test");
+	PipelineCommandExecuter tester = new PipelineCommandExecuter("./gradlew test");
 
 	Pipeline(PushEvent event, String pipelineDir) {
 		this.event = event;
@@ -89,7 +90,7 @@ class Pipeline {
 	}
 
 	private PipelineStatus test() {
-		return PipelineStatus.NotImplemented;
+		return tester.execute(pipelineDir, event);
 	}
 
 	// "notify" conflicts with Object.notify(). Think of Pingu instead! Noot noot!

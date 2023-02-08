@@ -41,5 +41,8 @@ tasks.withType<Jar> {
     val dependencies =
             configurations.runtimeClasspath.get().map(::zipTree) // OR .map { zipTree(it) }
     from(dependencies)
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+    exclude("META-INF/*.RSA")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

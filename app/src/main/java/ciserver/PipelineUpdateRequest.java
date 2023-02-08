@@ -16,12 +16,6 @@ enum CommitStatus {
     SUCCESS
 }
 
-enum PipelineStage {
-    PULL,
-    LINT,
-    COMPILE
-}
-
 /**
  * The RequestPath contains the path parameters of the PipelineUpdateRequest.
  **/
@@ -66,7 +60,7 @@ class PipelineUpdateRequestDTO {
     String url;
     String desc;
     String ctx;
-    PipelineStage failedOn;
+    TargetStage failedOn;
 
     /**
      * Creates a new PipelineUpdateRequest object.
@@ -85,7 +79,7 @@ class PipelineUpdateRequestDTO {
      **/
     PipelineUpdateRequestDTO(String owner, String repo, String sha,
             String token, CommitStatus state, String url,
-            String desc, String ctx, PipelineStage failedOn) {
+            String desc, String ctx, TargetStage failedOn) {
         this.owner = owner;
         this.repo = repo;
         this.sha = sha;
@@ -110,7 +104,7 @@ public class PipelineUpdateRequest {
 
     RequestPath path;
     RequestBody body;
-    Optional<PipelineStage> failedOn;
+    Optional<TargetStage> failedOn;
     String authTkn;
 
     /**

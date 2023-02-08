@@ -26,19 +26,12 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     private final Gson gson = new Gson();
     private final String GH_ACCESS_TOKEN = System.getenv("GH_ACCESS_TOKEN");
 
-    private void handlePushEvent(PushEvent event) {
-        System.err.printf("%s, %s", event.ref, event.headCommit.url);
-
-        // Here you do all the continuous integration tasks
-        // For example:
-        // 1st clone your repository
-        // 2nd compile the code
-
+    private void sendUpdateRequest(PushEvent event, CommitStatus status, String description, TargetStage failedOn) {
         // Build the response according to the pipeline's return status (dummy variables
         // used here as we have no "real" requests to start the pipeline with yet).
-        String[] repo_details = event.repository.full_name.split("/");
-        var dto = new PipelineUpdateRequestDTO(repo_details[0], repo_details[1], event.headCommit.id, GH_ACCESS_TOKEN,
-                CommitStatus.SUCCESS, "", "Test passed!", "ci", null);
+        String[] repoDetails = event.repository.full_name.split("/");
+        var dto = new PipelineUpdateRequestDTO(repoDetails[0], repoDetails[1], event.headCommit.id, GH_ACCESS_TOKEN,
+                status, "", description, "ci", failedOn);
 
         PipelineUpdateRequest pr = new PipelineUpdateRequest(dto);
 
@@ -50,6 +43,28 @@ public class ContinuousIntegrationServer extends AbstractHandler {
             }
         } catch (Exception e) {
             System.err.println(e);
+        }
+    }
+
+    private void handlePushEvent(PushEvent event) {
+        System.err.printf("%s, %s", event.ref, event.headCommit.url);
+
+        // 1st do ci work
+        var pipeline = new Pipeline(event, "../pipeline");
+        pipeline.addObserver(new PipelineObserver() {
+            @Override
+            public void update(TargetStage stage, PipelineStatus status) {
+                System.err.printf("Running stage: %s: %s\n", stage, status);
+
+                if (status == PipelineStatus.Fail) {
+                    sendUpdateRequest(event, CommitStatus.FAILURE, String.format("Failed during stage %s with status %s.", stage, status), stage);
+                }
+            }
+        });
+
+        var status = pipeline.start(TargetStage.ALL);
+        if (status == PipelineStatus.Ok) {
+            sendUpdateRequest(event, CommitStatus.SUCCESS, "Pipeline succeeded", null);
         }
 
         System.out.println("Commit status update sent successfully.");
@@ -81,16 +96,17 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
             switch (eventType.get()) {
                 case "push":
-                    System.out.println(body);
+                    // System.err.printf("Body: %s\n", body);
                     handlePushEvent(gson.fromJson(body, PushEvent.class));
                     break;
                 default: // Unimplemented, simply ignore
             }
 
         } catch (JsonSyntaxException e) {
+            e.printStackTrace();
             System.err.printf("There was an error parsing the JSON for event of type %s\n", eventType.get());
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
 
         response.getWriter().println("CI job done");

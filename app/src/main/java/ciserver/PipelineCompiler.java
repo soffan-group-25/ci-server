@@ -23,7 +23,7 @@ public class PipelineCompiler implements StageTask {
 	 * @return the status of the compilation action
 	 */
 	public PipelineStatus execute(String pipelineDir, PushEvent event) {
-		var path = String.format("%s/repositories/%s", pipelineDir, event.headCommit.id);
+		var path = String.format("%s/%s/%s", pipelineDir, event.repository.name, event.headCommit.id);
 		var directory = new File(path);
 		directory.mkdirs(); // Make the directories recursively
 
@@ -37,7 +37,10 @@ public class PipelineCompiler implements StageTask {
 			String output = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
 			System.err.println(output);
 
-			process.waitFor();
+			int status = process.waitFor();
+			if (status != 0) {
+				return PipelineStatus.Fail;
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			return PipelineStatus.Fail;

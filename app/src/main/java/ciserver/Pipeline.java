@@ -12,6 +12,7 @@ enum PipelineStatus {
 }
 
 enum TargetStage {
+	NONE,
 	PULL,
 	LINT,
 	COMPILE,
@@ -52,101 +53,106 @@ class Pipeline {
 	 * @return the status of the executed pipeline. OK if everything went ok.
 	 */
 	public PipelineStatus start(TargetStage target) {
+		// No target
+		if (target == TargetStage.NONE) {
+			return PipelineStatus.Ok;
+		}
+
+		// The reason status is redeclared in each stage is to prevent accidental usage
+		// of a status from a different stage.
 
 		// Pull
-		var status = pull();
-		notifyObservers(TargetStage.PULL, status);
-		if (status != PipelineStatus.Ok || target == TargetStage.PULL) {
-			return status;
+		{
+			notifyObservers(TargetStage.PULL, PipelineStatus.InProgress);
+
+			// Code goes here
+			var status = puller.execute(pipelineDir, event);
+
+			notifyObservers(TargetStage.PULL, status);
+			if (status != PipelineStatus.Ok || target == TargetStage.PULL) {
+				return status;
+			}
 		}
 
 		// Lint
-		status = lint();
-		notifyObservers(TargetStage.LINT, status);
-		if (status != PipelineStatus.Ok || target == TargetStage.LINT) {
-			return status;
+		{
+			notifyObservers(TargetStage.LINT, PipelineStatus.InProgress);
+
+			// Code goes here
+			var status = PipelineStatus.Ok;
+
+			notifyObservers(TargetStage.LINT, status);
+			if (status != PipelineStatus.Ok || target == TargetStage.LINT) {
+				return status;
+			}
 		}
 
 		// Compile
-		status = compile();
-		notifyObservers(TargetStage.COMPILE, status);
-		if (status != PipelineStatus.Ok || target == TargetStage.COMPILE) {
-			return status;
+		{
+			notifyObservers(TargetStage.COMPILE, PipelineStatus.InProgress);
+
+			// Code goes here
+			var status = compiler.execute(pipelineDir, event);
+
+			notifyObservers(TargetStage.COMPILE, status);
+			if (status != PipelineStatus.Ok || target == TargetStage.COMPILE) {
+				return status;
+			}
 		}
 
 		// Test
-		status = test();
-		notifyObservers(TargetStage.TESTING, status);
-		if (status != PipelineStatus.Ok || target == TargetStage.TESTING) {
-			return status;
+		{
+			notifyObservers(TargetStage.TESTING, PipelineStatus.InProgress);
+
+			// Code goes here
+			var status = PipelineStatus.NotImplemented;
+
+			notifyObservers(TargetStage.TESTING, status);
+			if (status != PipelineStatus.Ok || target == TargetStage.TESTING) {
+				return status;
+			}
 		}
 
 		// Notify
-		status = nootify();
-		notifyObservers(TargetStage.NOTIFICATION, status);
-		if (status != PipelineStatus.Ok || target == TargetStage.NOTIFICATION) {
-			return status;
+		{
+			notifyObservers(TargetStage.NOTIFICATION, PipelineStatus.InProgress);
+
+			// Code goes here
+			var status = PipelineStatus.NotImplemented;
+
+			notifyObservers(TargetStage.NOTIFICATION, status);
+			if (status != PipelineStatus.Ok || target == TargetStage.NOTIFICATION) {
+				return status;
+			}
 		}
 
 		return PipelineStatus.Ok;
 	}
 
-	private PipelineStatus pull() {
-		notifyObservers(TargetStage.PULL, PipelineStatus.InProgress);
-		var status = PipelineStatus.NotImplemented;
-
-		// Code goes here
-		status = puller.execute(pipelineDir, event);
-
-		return status;
-	}
-
-	private PipelineStatus lint() {
-		notifyObservers(TargetStage.LINT, PipelineStatus.InProgress);
-		var status = PipelineStatus.Ok;
-
-		// Code goes here
-
-		return status;
-	}
-
-	private PipelineStatus compile() {
-		notifyObservers(TargetStage.COMPILE, PipelineStatus.InProgress);
-		var status = PipelineStatus.NotImplemented;
-
-		// Code goes here
-		status = compiler.execute(pipelineDir, event);
-
-		return status;
-	}
-
-	private PipelineStatus test() {
-		notifyObservers(TargetStage.NOTIFICATION, PipelineStatus.InProgress);
-		var status = PipelineStatus.NotImplemented;
-
-		// Code goes here
-
-		return status;
-	}
-
-	// "notify" conflicts with Object.notify(). Think of Pingu instead! Noot noot!
-	private PipelineStatus nootify() {
-		notifyObservers(TargetStage.NOTIFICATION, PipelineStatus.InProgress);
-		var status = PipelineStatus.NotImplemented;
-
-		// Code goes here
-
-		return status;
-	}
-
+	/**
+	 * Adds an observer to the pipeline.
+	 *
+	 * @param observer is the observer to notify.
+	 */
 	public void addObserver(PipelineObserver observer) {
 		observers.add(observer);
 	}
 
+	/**
+	 * Unsubscribes the given observer.
+	 *
+	 * @param observer the observer to unsubscribe.
+	 */
 	public void removeObserver(PipelineObserver observer) {
 		observers.remove(observer);
 	}
 
+	/**
+	 * Notifies all the observers with a stage and status.
+	 *
+	 * @param stage  is the stage to notify about.
+	 * @param status is the status to notify about.
+	 */
 	public void notifyObservers(TargetStage stage, PipelineStatus status) {
 		for (PipelineObserver observer : observers) {
 			observer.update(stage, status);

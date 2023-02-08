@@ -32,13 +32,11 @@ class Pipeline {
 
 	String pipelineDir;
 	Commit commit;
-	PipelineStatus status;
 	List<PipelineObserver> observers = new ArrayList<PipelineObserver>();
 
 	Pipeline(Commit commit, String pipelineDir) {
 		this.commit = commit;
 		this.pipelineDir = pipelineDir;
-		this.status = PipelineStatus.NotStarted;
 	}
 
 	/**
@@ -50,7 +48,6 @@ class Pipeline {
 	public PipelineStatus start(TargetStage target) {
 
 		// Pull
-		notifyObservers(TargetStage.PULL, PipelineStatus.InProgress);
 		var status = pull();
 		notifyObservers(TargetStage.PULL, status);
 		if (status != PipelineStatus.Ok || target == TargetStage.PULL) {
@@ -58,7 +55,6 @@ class Pipeline {
 		}
 
 		// Lint
-		notifyObservers(TargetStage.LINT, PipelineStatus.InProgress);
 		status = lint();
 		notifyObservers(TargetStage.LINT, status);
 		if (status != PipelineStatus.Ok || target == TargetStage.LINT) {
@@ -66,7 +62,6 @@ class Pipeline {
 		}
 
 		// Compile
-		notifyObservers(TargetStage.COMPILE, PipelineStatus.InProgress);
 		status = compile();
 		notifyObservers(TargetStage.COMPILE, status);
 		if (status != PipelineStatus.Ok || target == TargetStage.COMPILE) {
@@ -74,7 +69,6 @@ class Pipeline {
 		}
 
 		// Test
-		notifyObservers(TargetStage.NOTIFICATION, PipelineStatus.InProgress);
 		status = test();
 		notifyObservers(TargetStage.TESTING, status);
 		if (status != PipelineStatus.Ok || target == TargetStage.TESTING) {
@@ -82,7 +76,6 @@ class Pipeline {
 		}
 
 		// Notify
-		notifyObservers(TargetStage.NOTIFICATION, PipelineStatus.InProgress);
 		status = nootify();
 		notifyObservers(TargetStage.NOTIFICATION, status);
 		if (status != PipelineStatus.Ok || target == TargetStage.NOTIFICATION) {
@@ -93,24 +86,49 @@ class Pipeline {
 	}
 
 	private PipelineStatus pull() {
-		return PipelineStatus.NotImplemented;
+		notifyObservers(TargetStage.PULL, PipelineStatus.InProgress);
+		var status = PipelineStatus.NotImplemented;
+
+		// Code goes here
+
+		return status;
 	}
 
 	private PipelineStatus lint() {
-		return PipelineStatus.NotImplemented;
+		notifyObservers(TargetStage.LINT, PipelineStatus.InProgress);
+		var status = PipelineStatus.Ok;
+
+		// Code goes here
+
+		return status;
 	}
 
 	private PipelineStatus compile() {
-		return PipelineStatus.NotImplemented;
+		notifyObservers(TargetStage.COMPILE, PipelineStatus.InProgress);
+		var status = PipelineStatus.NotImplemented;
+
+		// Code goes here
+
+		return status;
 	}
 
 	private PipelineStatus test() {
-		return PipelineStatus.NotImplemented;
+		notifyObservers(TargetStage.NOTIFICATION, PipelineStatus.InProgress);
+		var status = PipelineStatus.NotImplemented;
+
+		// Code goes here
+
+		return status;
 	}
 
 	// "notify" conflicts with Object.notify(). Think of Pingu instead! Noot noot!
 	private PipelineStatus nootify() {
-		return PipelineStatus.NotImplemented;
+		notifyObservers(TargetStage.NOTIFICATION, PipelineStatus.InProgress);
+		var status = PipelineStatus.NotImplemented;
+
+		// Code goes here
+
+		return status;
 	}
 
 	public void addObserver(PipelineObserver observer) {

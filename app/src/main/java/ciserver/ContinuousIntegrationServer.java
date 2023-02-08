@@ -56,7 +56,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     }
 
     /**
-     * See
+     * Handle an HTTP request to the CI server. See
      * <a
      * href=https://www.eclipse.org/jetty/javadoc/jetty-9/org/eclipse/jetty/server/handler/AbstractHandler.html#handle(java.lang.String,org.eclipse.jetty.server.Request,javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)>documentation
      * of the parent interface</a>

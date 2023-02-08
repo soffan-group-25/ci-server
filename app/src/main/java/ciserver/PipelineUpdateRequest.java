@@ -53,6 +53,48 @@ class RequestBody {
     }
 }
 
+class PipelineUpdateRequestDTO {
+
+    String owner;
+    String repo;
+    String sha;
+    String token;
+    CommitStatus state;
+    String url;
+    String desc;
+    String ctx;
+    PipelineStage failedOn;
+
+    /**
+     * Creates a new PipelineUpdateRequest object.
+     *
+     * @param owner    The owner of the repository containing the relevant commit.
+     * @param repo     The name of the repository containing the relevant commit.
+     * @param sha      The SHA (hash) of the relevant commit.
+     * @param token    An API authentication token used by the CI server to access
+     *                 the repository and set the commit status.
+     * @param state    The state to set the commit status to.
+     * @param url      A link to view build logs and other output from the server.
+     * @param desc     A short description of the state.
+     * @param ctx      A (case insensitive) label used to differentiate this state
+     *                 from a state set by another system.
+     * @param failedOn The stage where the Pipeline failed, or null if it succeeded.
+     **/
+    PipelineUpdateRequestDTO(String owner, String repo, String sha,
+            String token, CommitStatus state, String url,
+            String desc, String ctx, PipelineStage failedOn) {
+        this.owner = owner;
+        this.repo = repo;
+        this.sha = sha;
+        this.token = token;
+        this.state = state;
+        this.url = url;
+        this.desc = desc;
+        this.ctx = ctx;
+        this.failedOn = failedOn;
+    }
+}
+
 /**
  * A PipelineUpdateRequest is a class used to update the status of a commit on
  * GitHub.
@@ -71,25 +113,14 @@ public class PipelineUpdateRequest {
     /**
      * Creates a new PipelineUpdateRequest object.
      *
-     * @param owner    The owner of the repository containing the relevant commit.
-     * @param repo     The name of the repository containing the relevant commit.
-     * @param sha      The SHA (hash) of the relevant commit.
-     * @param token    An API authentication token used by the CI server to access
-     *                 the repository and set the commit status.
-     * @param state    The state to set the commit status to.
-     * @param url      A link to view build logs and other output from the server.
-     * @param desc     A short description of the state.
-     * @param ctx      A (case insensitive) label used to differentiate this state
-     *                 from a state set by another system.
-     * @param failedOn The stage where the Pipeline failed, or null if it succeeded.
+     * @param DTO An object containing all relevant data.
      **/
-    PipelineUpdateRequest(String owner, String repo, String sha, String token, CommitStatus state, String url,
-            String desc, String ctx, PipelineStage failedOn) {
-        this.path = new RequestPath(owner, repo, sha);
-        String state_str = state.toString().toLowerCase();
-        this.body = new RequestBody(state_str, url, desc, ctx);
-        this.failedOn = Optional.ofNullable(failedOn);
-        this.auth_tkn = token;
+    PipelineUpdateRequest(PipelineUpdateRequestDTO dto) {
+        this.path = new RequestPath(dto.owner, dto.repo, dto.sha);
+        String state_str = dto.state.toString().toLowerCase();
+        this.body = new RequestBody(state_str, dto.url, dto.desc, dto.ctx);
+        this.failedOn = Optional.ofNullable(dto.failedOn);
+        this.auth_tkn = dto.token;
     }
 
     /**

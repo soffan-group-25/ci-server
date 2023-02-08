@@ -32,8 +32,10 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         // Build the response according to the pipeline's return status (dummy variables
         // used here as we have no "real" requests to start the pipeline with yet).
         String[] repo_details = event.repository.full_name.split("/");
-        PipelineUpdateRequest pr = new PipelineUpdateRequest(repo_details[0], repo_details[1], event.headCommit.id,
-                GH_ACCESS_TOKEN, CommitStatus.SUCCESS, "", "Test passed!", "ci", null);
+        var dto = new PipelineUpdateRequestDTO(repo_details[0], repo_details[1], event.headCommit.id, GH_ACCESS_TOKEN,
+                CommitStatus.SUCCESS, "", "Test passed!", "ci", null);
+
+        PipelineUpdateRequest pr = new PipelineUpdateRequest(dto);
 
         try {
             HttpResponse<String> res = pr.send();

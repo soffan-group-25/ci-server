@@ -8,34 +8,40 @@ import java.net.http.HttpResponse;
 import java.util.NoSuchElementException;
 
 public class PipelineUpdateRequestTest {
+    private PipelineUpdateRequestDTO getPR() {
+        return new PipelineUpdateRequestDTO("soffan-group-25", "ci-server", "123abc",
+                "token", CommitStatus.SUCCESS, "www.learn-more-about.this-build.com", "Test passed!", "ci", null);
+    }
+
     @Test
     public void PipelineUpdateRequestEnum() {
-        PipelineUpdateRequest pr = new PipelineUpdateRequest("soffan-group-25", "ci-server", "123abc", "token",
-                CommitStatus.SUCCESS, "www.learn-more-about.this-build.com", "Test passed!", "ci", null);
+        var dto = getPR();
+        var pr = new PipelineUpdateRequest(dto);
         assertEquals(pr.body.state, "success");
     }
 
     @Test
     public void PipeLineUpdateRequestPathParams() {
-        PipelineUpdateRequest pr = new PipelineUpdateRequest("soffan-group-25", "ci-server", "123abc", "token",
-                CommitStatus.SUCCESS, "www.learn-more-about.this-build.com", "Test passed!", "ci", null);
+        var dto = getPR();
+        var pr = new PipelineUpdateRequest(dto);
         assertEquals(pr.path.owner, "soffan-group-25");
         assertEquals(pr.path.repository, "ci-server");
     }
 
     @Test
     public void PipelineUpdateRequestFail() {
-        PipelineUpdateRequest pr = new PipelineUpdateRequest("soffan-group-25", "ci-server", "123abc", "token",
-                CommitStatus.FAILURE, "www.learn-more-about.this-build.com", "Test passed!", "ci",
-                PipelineStage.COMPILE);
+        var dto = getPR();
+        dto.state = CommitStatus.FAILURE;
+        dto.failedOn = PipelineStage.COMPILE;
+        var pr = new PipelineUpdateRequest(dto);
         assert (!pr.failedOn.isEmpty());
         assertEquals(pr.failedOn.get(), PipelineStage.COMPILE);
     }
 
     @Test(expected = NoSuchElementException.class)
     public void PipelineUpdateRequestNoFail() {
-        PipelineUpdateRequest pr = new PipelineUpdateRequest("soffan-group-25", "ci-server", "123abc", "token",
-                CommitStatus.SUCCESS, "www.learn-more-about.this-build.com", "Test passed!", "ci", null);
+        var dto = getPR();
+        var pr = new PipelineUpdateRequest(dto);
         assert (pr.failedOn.isEmpty());
 
         // Throw
@@ -44,9 +50,8 @@ public class PipelineUpdateRequestTest {
 
     @Test
     public void TestInvalidToken() throws InterruptedException, IOException {
-        PipelineUpdateRequest pr = new PipelineUpdateRequest("soffan-group-25", "ci-server", "123abc", "token",
-                CommitStatus.SUCCESS, "www.learn-more-about.this-build.com", "Test passed!", "ci", null);
-
+        var dto = getPR();
+        var pr = new PipelineUpdateRequest(dto);
         HttpResponse<String> resp = pr.send();
         // API response code for "bad credentials"
         assert (resp.statusCode() == 401);

@@ -19,7 +19,7 @@ public class App {
     /**
      * Print a greeting then launch the CI server
      *
-     * @param args the arguments to the program, not used
+     * @param args the command line arguments to the program; not used
      */
     public static void main(String[] args) {
         System.out.println(new App().getGreeting());

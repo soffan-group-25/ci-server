@@ -17,7 +17,6 @@ enum TargetStage {
 	LINT,
 	COMPILE,
 	TESTING,
-	NOTIFICATION,
 	ALL
 }
 
@@ -39,7 +38,7 @@ class Pipeline {
 	private final PushEvent event;
 	private List<PipelineObserver> observers = new ArrayList<PipelineObserver>();
 	PipelinePuller puller = new PipelinePuller();
-	PipelineCompiler compiler = new PipelineCompiler("./gradlew build");
+	PipelineCompiler compiler = new PipelineCompiler("/bin/sh", "gradlew", "build", "-x", "test");
 
 	Pipeline(PushEvent event, String pipelineDir) {
 		this.event = event;

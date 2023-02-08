@@ -36,7 +36,7 @@ public class PipelineCompilerTest {
         assertEquals(PipelineStatus.Ok, status);
 
         File directory = new File(
-                String.format("%s/repositories/%s", PipelineTest.PipelineTestingDirectory,
+                String.format("%s/%s/%s", PipelineTest.PipelineTestingDirectory, event.repository.name,
                         event.headCommit.id));
         assertTrue(directory.isDirectory());
 

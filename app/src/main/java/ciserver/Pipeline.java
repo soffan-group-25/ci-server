@@ -1,14 +1,20 @@
 package ciserver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 enum PipelineStatus {
 	Ok,
 	Fail,
 	NotImplemented,
 	NotStarted,
 	InProgress
+}
+
+enum Target {
+	PULL,
+	LINT,
+	COMPILE,
+	TESTING,
+	NOTIFICATION,
+	ALL
 }
 
 interface PipelineStage {
@@ -20,16 +26,10 @@ interface PipelineStage {
  * for a specific commit.
  */
 class Pipeline {
-
-	/*
-	 * Continue with PipelineLinter, PipelineCompiler
-	 * Reason for this abstraction is easier testability,
-	 * As one can individually test the pull, lint, compile functionality,
-	 * without having a bunch of public methods in the Pipeline class.
-	 */
-	private ArrayList<PipelineStage> stages = new ArrayList<>();
 	private final String pipelineDir;
 	private final PushEvent event;
+
+	PipelinePuller puller = new PipelinePuller();
 
 	Pipeline(PushEvent event, String pipelineDir) {
 		this.event = event;
@@ -37,30 +37,62 @@ class Pipeline {
 	}
 
 	/**
-	 * Add stages to the Pipeline.
+	 * Start the pipeline.
 	 *
-	 * @param stages the stages to add
-	 * @return the pipeline
+	 * @return the status of the executed pipeline. OK if everything went ok.
 	 */
-	public Pipeline withComponent(PipelineStage... stages) {
-		this.stages.addAll(Arrays.asList(stages));
+	public PipelineStatus start(Target target) {
+		// Pull
+		var status = pull();
+		if (status != PipelineStatus.Ok || target == Target.PULL) {
+			return status;
+		}
 
-		return this;
-	}
+		// Lint
+		status = lint();
+		if (status != PipelineStatus.Ok || target == Target.LINT) {
+			return status;
+		}
 
-	/**
-	 * Start the pipeline with the added stages.
-	 *
-	 * @return the status of the pipeline execution
-	 */
-	public PipelineStatus start() {
-		for (var component : stages) {
-			var status = component.execute(pipelineDir, event);
-			if (status != PipelineStatus.Ok) {
-				return status;
-			}
+		// Compile
+		status = compile();
+		if (status != PipelineStatus.Ok || target == Target.COMPILE) {
+			return status;
+		}
+
+		// Test
+		status = test();
+		if (status != PipelineStatus.Ok || target == Target.TESTING) {
+			return status;
+		}
+
+		// Notify
+		status = nootify();
+		if (status != PipelineStatus.Ok || target == Target.NOTIFICATION) {
+			return status;
 		}
 
 		return PipelineStatus.Ok;
+	}
+
+	private PipelineStatus pull() {
+		return puller.execute(pipelineDir, event);
+	}
+
+	private PipelineStatus lint() {
+		return PipelineStatus.NotImplemented;
+	}
+
+	private PipelineStatus compile() {
+		return PipelineStatus.NotImplemented;
+	}
+
+	private PipelineStatus test() {
+		return PipelineStatus.NotImplemented;
+	}
+
+	// "notify" conflicts with Object.notify(). Think of Pingu instead! Noot noot!
+	private PipelineStatus nootify() {
+		return PipelineStatus.NotImplemented;
 	}
 }

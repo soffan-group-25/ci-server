@@ -20,14 +20,14 @@ public class PipelinePullerTest {
     public void canPull() throws IOException {
         var gson = new Gson();
         var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
-        var pipeline = new Pipeline(event, PipelineTest.PipelineTestingDirectory)
-                .withComponent(new PipelinePuller());
+        var pipeline = new Pipeline(event, PipelineTest.PipelineTestingDirectory);
 
-        var status = pipeline.start();
+        var status = pipeline.start(Target.PULL);
         assertEquals(status, PipelineStatus.Ok);
 
         File directory = new File(
-                String.format("%s/%s/%s", PipelineTest.PipelineTestingDirectory, event.repository.name, event.headCommit.id));
+                String.format("%s/%s/%s", PipelineTest.PipelineTestingDirectory, event.repository.name,
+                        event.headCommit.id));
         assertTrue(directory.isDirectory());
 
         try {

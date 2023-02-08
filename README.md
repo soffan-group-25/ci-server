@@ -29,3 +29,5 @@ The task is to create a continus integration server, the Canvas page can be foun
 ### Håvard Alstadheim
 
 ### Pontus Söderlund
+
+Fippel

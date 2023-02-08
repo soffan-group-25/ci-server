@@ -54,10 +54,11 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         pipeline.addObserver(new PipelineObserver() {
             @Override
             public void update(TargetStage stage, PipelineStatus status) {
-                System.err.printf("Running stage: %s: %s\n", stage, status);
+                System.err.printf("\tRunning stage: %s: %s\n", stage, status);
 
                 if (status == PipelineStatus.Fail) {
-                    sendUpdateRequest(event, CommitStatus.FAILURE, String.format("Failed during stage %s with status %s.", stage, status), stage);
+                    sendUpdateRequest(event, CommitStatus.FAILURE,
+                            String.format("Failed during stage %s with status %s.", stage, status), stage);
                 }
             }
         });
@@ -96,7 +97,6 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
             switch (eventType.get()) {
                 case "push":
-                    // System.err.printf("Body: %s\n", body);
                     handlePushEvent(gson.fromJson(body, PushEvent.class));
                     break;
                 default: // Unimplemented, simply ignore

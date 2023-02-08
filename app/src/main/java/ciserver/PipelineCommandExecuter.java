@@ -14,6 +14,11 @@ import org.apache.commons.io.IOUtils;
 public class PipelineCommandExecuter implements StageTask {
 	public final ArrayList<String> commands = new ArrayList<>();
 
+    /**
+     * constructs a PipelineCompiler for running a certain set of commands
+     *
+     * @param commands is the command(s) to run
+     */
 	PipelineCommandExecuter(String... commands) {
 		this.commands.addAll(Arrays.asList(commands));
 	}
@@ -22,6 +27,9 @@ public class PipelineCommandExecuter implements StageTask {
 	 * Run the specified `commands` in the folder of the pulled repository.
 	 *
 	 * Note: the PipelinePull component or a similar action must be run before this.
+     *
+     * @param pipelineDir the (grand)parent directory to run the commands in
+     * @param event       specifies a subdirectory based on the repo name and head commit id
 	 *
 	 * @return the status of the compilation action
 	 */

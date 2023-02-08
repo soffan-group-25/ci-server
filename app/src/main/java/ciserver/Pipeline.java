@@ -38,7 +38,8 @@ class Pipeline {
     private final PushEvent event;
     private List<PipelineObserver> observers = new ArrayList<PipelineObserver>();
     PipelinePuller puller = new PipelinePuller();
-    PipelineCompiler compiler = new PipelineCompiler("/bin/sh", "gradlew", "build", "-x", "test");
+    PipelineCommandExecuter compiler = new PipelineCommandExecuter("/bin/sh", "gradlew", "build", "-x", "test");
+    PipelineCommandExecuter tester = new PipelineCommandExecuter("/bin/sh", "gradlew", "test");
 
     Pipeline(PushEvent event, String pipelineDir) {
         this.event = event;
@@ -64,7 +65,6 @@ class Pipeline {
         {
             notifyObservers(TargetStage.PULL, PipelineStatus.InProgress);
 
-            // Code goes here
             var status = puller.execute(pipelineDir, event);
 
             notifyObservers(TargetStage.PULL, status);
@@ -77,7 +77,6 @@ class Pipeline {
         {
             notifyObservers(TargetStage.LINT, PipelineStatus.InProgress);
 
-            // Code goes here
             var status = PipelineStatus.Ok;
 
             notifyObservers(TargetStage.LINT, status);
@@ -90,7 +89,6 @@ class Pipeline {
         {
             notifyObservers(TargetStage.COMPILE, PipelineStatus.InProgress);
 
-            // Code goes here
             var status = compiler.execute(pipelineDir, event);
 
             notifyObservers(TargetStage.COMPILE, status);
@@ -103,8 +101,7 @@ class Pipeline {
         {
             notifyObservers(TargetStage.TESTING, PipelineStatus.InProgress);
 
-            // Code goes here
-            var status = PipelineStatus.NotImplemented;
+            var status = tester.execute(pipelineDir, event);
 
             notifyObservers(TargetStage.TESTING, status);
             if (status != PipelineStatus.Ok || target == TargetStage.TESTING) {

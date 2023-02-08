@@ -33,7 +33,8 @@ public class ContinuousIntegrationServerTest {
 
         var event = (new Gson()).fromJson(PushEventTest.TestData, PushEvent.class);
         var pipeline = new Pipeline(event, PipelineTest.PipelineTestingDirectory);
-        pipeline.compiler = new PipelineCompiler("touch", "test_file.txt");
+        pipeline.compiler = new PipelineCommandExecuter("touch", "test_file.txt");
+        pipeline.tester = new PipelineCommandExecuter("touch", "test_file2.txt");
 
         var observer = new PipelineObserver() {
             ArrayList<Update> updates = new ArrayList<>();
@@ -45,7 +46,7 @@ public class ContinuousIntegrationServerTest {
         };
 
         var status = method.invoke(server, event, pipeline, observer);
-        assertEquals(status, PipelineStatus.Ok);
+        assertEquals(PipelineStatus.Ok, status);
 
         var expectedUpdates = new ArrayList<Update>();
         expectedUpdates.add(new Update(TargetStage.PULL, PipelineStatus.InProgress));
@@ -60,7 +61,7 @@ public class ContinuousIntegrationServerTest {
         for (int i = 0; i < expectedUpdates.size(); i++) {
             var expected = expectedUpdates.get(i);
             var got = observer.updates.get(i);
-            
+
             assertNotNull(got);
             assertEquals(expected.stage, got.stage);
             assertEquals(expected.status, got.status);

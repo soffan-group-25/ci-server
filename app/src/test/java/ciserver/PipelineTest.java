@@ -7,14 +7,18 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.google.gson.Gson;
+
 public class PipelineTest {
 
     public static final String PipelineTestingDirectory = "../pipeline_testing";
-    
+
     @Test
     public void canExecutePipeline() {
-        var commit = new Commit();
-        var pipeline = new Pipeline(commit, "./pipeline");
+        var gson = new Gson();
+        var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
+
+        var pipeline = new Pipeline(event, "./pipeline");
         assertNotNull(pipeline);
 
         var status = pipeline.start(TargetStage.ALL);
@@ -23,8 +27,10 @@ public class PipelineTest {
 
     @Test
     public void pipelineObserverIsNotified() {
-        var commit = new Commit();
-        var pipeline = new Pipeline(commit, "./pipeline");
+        var gson = new Gson();
+        var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
+
+        var pipeline = new Pipeline(event, "./pipeline");
         var pipelineObserver = new PipelineObserver() {
 
             boolean observerIsNotified = false;

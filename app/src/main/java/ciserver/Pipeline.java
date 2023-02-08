@@ -24,7 +24,7 @@ interface PipelineObserver {
 	public void update(TargetStage stage, PipelineStatus status);
 }
 
-interface TargetStage {
+interface StageTask {
 	public PipelineStatus execute(String pipelineDir, PushEvent event);
 }
 
@@ -36,7 +36,7 @@ class Pipeline {
 
 	private final String pipelineDir;
 	private final PushEvent event;
-  private List<PipelineObserver> observers = new ArrayList<PipelineObserver>();
+	private List<PipelineObserver> observers = new ArrayList<PipelineObserver>();
 	private PipelinePuller puller = new PipelinePuller();
 
 	Pipeline(PushEvent event, String pipelineDir) {
@@ -55,7 +55,7 @@ class Pipeline {
 		// Pull
 		var status = pull();
 		notifyObservers(TargetStage.PULL, status);
-		if (status != PipelineStatus.Ok || target == Target.PULL) {
+		if (status != PipelineStatus.Ok || target == TargetStage.PULL) {
 			return status;
 		}
 
@@ -75,7 +75,7 @@ class Pipeline {
 
 		// Test
 		status = test();
-    notifyObservers(TargetStage.TESTING, status);
+		notifyObservers(TargetStage.TESTING, status);
 		if (status != PipelineStatus.Ok || target == TargetStage.TESTING) {
 			return status;
 		}
@@ -95,6 +95,7 @@ class Pipeline {
 		var status = PipelineStatus.NotImplemented;
 
 		// Code goes here
+		status = puller.execute(pipelineDir, event);
 
 		return status;
 	}

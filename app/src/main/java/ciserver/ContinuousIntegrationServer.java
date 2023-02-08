@@ -18,8 +18,8 @@ import com.google.gson.JsonSyntaxException;
 
 public class ContinuousIntegrationServer extends AbstractHandler {
 
-    Gson gson = new Gson();
-    final String GH_ACCESS_TOKEN = System.getenv("GH_ACCESS_TOKEN");
+    private final Gson gson = new Gson();
+    private final String GH_ACCESS_TOKEN = System.getenv("GH_ACCESS_TOKEN");
 
     private void handlePushEvent(PushEvent event) {
         System.err.printf("%s, %s", event.ref, event.headCommit.url);

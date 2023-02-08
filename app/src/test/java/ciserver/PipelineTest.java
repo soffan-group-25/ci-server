@@ -7,13 +7,34 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class PipelineTest {
+
     @Test
     public void canExecutePipeline() {
         var commit = new Commit();
         var pipeline = new Pipeline(commit, "./pipeline");
         assertNotNull(pipeline);
 
-        var status = pipeline.start(Target.ALL);
+        var status = pipeline.start(TargetStage.ALL);
         assertNotNull(status);
+    }
+
+    @Test
+    public void pipelineObserverIsNotified() {
+        var commit = new Commit();
+        var pipeline = new Pipeline(commit, "./pipeline");
+        var pipelineObserver = new PipelineObserver() {
+
+            boolean observerIsNotified = false;
+
+            @Override
+            public void update(TargetStage stage, PipelineStatus status) {
+                observerIsNotified = true;
+            }
+        };
+
+        pipeline.addObserver(pipelineObserver);
+        pipeline.start(TargetStage.ALL);
+
+        assertTrue(pipelineObserver.observerIsNotified);
     }
 }

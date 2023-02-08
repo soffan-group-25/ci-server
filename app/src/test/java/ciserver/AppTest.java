@@ -6,7 +6,15 @@ package ciserver;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+/**
+ * tests the initial class to start the CI server program
+ */
 public class AppTest {
+    /**
+     * test that the program can communicate within itself
+     *
+     * should always return positive 
+     */
     @Test public void appHasAGreeting() {
         App classUnderTest = new App();
         assertNotNull("app should have a greeting", classUnderTest.getGreeting());

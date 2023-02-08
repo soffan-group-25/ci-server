@@ -4,7 +4,7 @@ This is an assignment for the course [DD2480 Software Engineering Fundamentals](
 
 The task is to create a continus integration server, the Canvas page can be found [here](https://canvas.kth.se/courses/37918/assignments/235346).
 
-## Building, testing and running
+## Building, testing, running and documentation
 
 ### Building
 
@@ -17,6 +17,12 @@ The task is to create a continus integration server, the Canvas page can be foun
 ### Running
 
 `./gradlew run`
+
+### Documentation
+
+`./gradlew javadoc`
+
+The generated documentation can be browsed from `./app/build/docs/javadoc/index.html`
 
 ## Statement of contributions
 

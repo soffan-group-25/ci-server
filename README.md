@@ -18,6 +18,10 @@ The task is to create a continus integration server, the Canvas page can be foun
 
 `./gradlew run`
 
+## Essence - Way of Working
+
+Our team assessment and documentation in accordance to the Essence standard is [documented here](./Essence.md).
+
 ## Statement of contributions
 
 ### Daniel Williams

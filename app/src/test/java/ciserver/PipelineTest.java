@@ -3,17 +3,19 @@
  */
 package ciserver;
 
-import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class PipelineTest {
-    @Test
-    public void canExecutePipeline() {
-        var commit = new Commit();
-        var pipeline = new Pipeline(commit, "./pipeline");
-        assertNotNull(pipeline);
+import org.junit.Test;
 
-        var status = pipeline.start();
-        assertNotNull(status);
+public class PipelineTest {
+    public static final String PipelineTestingDirectory = "../pipeline_testing";
+
+    @Test
+    public void canCreatePipeline() {
+        var event = new PushEvent();
+
+        // The relative directory is in the app folder, use `..` to go up
+        var pipeline = new Pipeline(event, "../pipeline");
+        assertNotNull(pipeline);
     }
 }

@@ -25,3 +25,6 @@ gradle-app.setting
 
 # vs code files
 /.vscode
+
+# pipeline data
+/pipeline

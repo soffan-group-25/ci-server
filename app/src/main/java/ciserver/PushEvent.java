@@ -7,6 +7,9 @@ import com.google.gson.annotations.SerializedName;
 class Repository {
 	String name;
 	String full_name;
+
+	@SerializedName("clone_url")
+	String cloneUrl;
 }
 
 class Author {

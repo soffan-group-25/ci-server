@@ -120,8 +120,8 @@ public class PipelineUpdateRequest {
      **/
     PipelineUpdateRequest(PipelineUpdateRequestDTO dto) {
         this.path = new RequestPath(dto.owner, dto.repo, dto.sha);
-        String state_str = dto.state.toString().toLowerCase();
-        this.body = new RequestBody(state_str, dto.url, dto.desc, dto.ctx);
+        String stateStr = dto.state.toString().toLowerCase();
+        this.body = new RequestBody(stateStr, dto.url, dto.desc, dto.ctx);
         this.failedOn = Optional.ofNullable(dto.failedOn);
         this.authTkn = dto.token;
     }

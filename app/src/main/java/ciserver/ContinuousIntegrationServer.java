@@ -9,11 +9,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -63,10 +61,10 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
     private void logBuild(PushEvent event, PipelineResult result) {
         try {
-            var fileName = String.format("%s-%s-%s.%s:%s:%s.%s.log", Calendar.getInstance().get(Calendar.YEAR),
+            var fileName = String.format("%s-%s-%s.%s:%s:%s.%s.%s.log", Calendar.getInstance().get(Calendar.YEAR),
                     Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH),
                     Calendar.getInstance().get(Calendar.HOUR), Calendar.getInstance().get(Calendar.MINUTE),
-                    Calendar.getInstance().get(Calendar.SECOND), event.headCommit.id);
+                    Calendar.getInstance().get(Calendar.SECOND), event.headCommit.id, result.status);
             File dir = new File(String.format("%s/logs/%s", pipelineDir, event.repository.name));
             dir.mkdirs();
             File file = new File(String.format("%s/logs/%s/%s", pipelineDir, event.repository.name, fileName));
@@ -123,7 +121,9 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     }
 
     private void handleSpecificLogRequest(ArrayList<String> url, HttpServletResponse response) throws IOException {
-        File file = new File(String.format("%s/logs/%s", pipelineDir, url.get(2)));
+        System.err.printf("%s, %s", url.get(2), url.get(3));
+
+        File file = new File(String.format("%s/logs/%s/%s", pipelineDir, url.get(2), url.get(3)));
         if (!file.exists()) {
             return;
         }
@@ -131,8 +131,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         var contents = FileUtils.readFileToString(file, "UTF-8");
         var writer = response.getWriter();
 
-        writer.println(contents);
-
+        writer.printf("<pre>%s</pre>", contents);
     }
 
     private void handleLogRequest(ArrayList<String> url, HttpServletResponse response) throws IOException {
@@ -158,9 +157,11 @@ public class ContinuousIntegrationServer extends AbstractHandler {
             for (var logFile : project.listFiles()) {
                 var logPath = logFile.getPath().split("/");
                 var logName = logPath[logPath.length - 1];
+                var logComponents = logName.split(".");
+                var logStatus = logComponents[logComponents.length - 2]; // failed, ok
 
                 writer.printf("<li>");
-                writer.printf("<a href=\"%s/%s\"><h6>%s</h6></a>", projectName, logName, logName);
+                writer.printf("<a href=\"/log/%s/%s\"><h6>[%s] %s</h6></a>", projectName, logName, logStatus, logName);
                 writer.printf("</li>");
             }
             writer.printf("</ul>");
@@ -187,7 +188,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
         var url = new ArrayList<>(Arrays.asList(request.getRequestURI().split("/")));
 
-        if (url.size() >= 1 && "log".equals(url.get(1))) {
+        if (url.size() >= 1) {
             handleLogRequest(url, response);
             return;
         }

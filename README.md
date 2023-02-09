@@ -43,6 +43,10 @@ Our team assessment and documentation in accordance to the Essence standard is [
 
 ### Daniel Williams
 
+* Sending HTTP POST requests
+* Connect commit statuses to web frontend
+* Set up an environment that the server could run in 24/7
+
 ### Didrik Munther
 
 * Frontend build log

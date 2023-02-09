@@ -138,8 +138,8 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         baseRequest.setHandled(true);
 
         var url = new ArrayList<>(Arrays.asList(request.getRequestURI().split("/")));
-        
-        if ("log".equals(url.get(1))) {
+
+        if (url.size() >= 1 && "log".equals(url.get(1))) {
             handleLogRequest(request, response);
             return;
         }

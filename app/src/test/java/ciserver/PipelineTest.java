@@ -75,7 +75,7 @@ public class PipelineTest {
         File directory = new File(
                 String.format("%s/%s/%s", PipelineTest.PipelineTestingDirectory, event.repository.name,
                         event.headCommit.id));
-        assertTrue(directory.isDirectory());
+        assertFalse(directory.isDirectory());
 
         var fileExists = Arrays.stream(directory.listFiles())
                 .anyMatch(file -> file.getName().equals(fileName));

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.eclipse.jetty.server.Server;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
@@ -121,21 +123,33 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     }
 
     private void handleLogRequest(ArrayList<String> url, HttpServletResponse response) throws IOException {
-        File dir = new File(String.format("%s", pipelineDir));
+        File dir = new File(String.format("%s/logs", pipelineDir));
         dir.mkdirs();
 
-        var logs = new HashMap<String, ArrayList<File>>();
+        var writer = response.getWriter();
 
-        for(var project: dir.listFiles()) {
-            File logFile = new File("%s/logs", project.getPath());
-            logFile.mkdirs();
+        writer.printf("<ul>");
+        for (var project : dir.listFiles()) {
+            var projectPath = project.getPath().split("/");
+            var projectName = projectPath[projectPath.length - 1];
 
-            // logs.put(project.getPath(), null)
+            writer.printf("<li>");
+            writer.printf("<h5>%s</h5>", projectName);
+            writer.printf("<ul>");
+            for (var logFile : project.listFiles()) {
+                var logPath = logFile.getPath().split("/");
+                var logName = logPath[logPath.length - 1];
+                var contents = FileUtils.readFileToString(logFile, "UTF-8");
 
-            System.err.printf("%s", project.getPath());
+                writer.printf("<li>");
+                writer.printf("<h6>%s</h6>", logName);
+                writer.printf("<pre>%s</pre>", contents);
+                writer.printf("</li>");
+            }
+            writer.printf("</ul>");
+            writer.printf("</li>");
         }
-
-        response.getWriter().println("Showing log");
+        writer.printf("</ul>");
     }
 
     /**

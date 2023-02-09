@@ -69,8 +69,8 @@ public class PipelineTest {
         var pipeline = new Pipeline(event, PipelineTest.PipelineTestingDirectory);
         pipeline.compiler = new PipelineCommandExecuter("touch", fileName);
 
-        var status = pipeline.start(TargetStage.COMPILE);
-        assertEquals(PipelineStatus.Ok, status);
+        var result = pipeline.start(TargetStage.COMPILE);
+        assertEquals(PipelineStatus.Ok, result.status);
 
         File directory = new File(
                 String.format("%s/%s/%s", PipelineTest.PipelineTestingDirectory, event.repository.name,

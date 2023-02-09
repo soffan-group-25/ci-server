@@ -46,7 +46,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         }
     }
 
-    private PipelineStatus executePipeline(PushEvent event, Pipeline pipeline, PipelineObserver observer) {
+    private PipelineResult executePipeline(PushEvent event, Pipeline pipeline, PipelineObserver observer) {
         pipeline.addObserver(observer);
         return pipeline.start(TargetStage.ALL);
 
@@ -56,7 +56,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         System.err.printf("%s, %s", event.ref, event.headCommit.url);
 
         var pipeline = new Pipeline(event, "../pipeline");
-        var status = executePipeline(event, pipeline, new PipelineObserver() {
+        var result = executePipeline(event, pipeline, new PipelineObserver() {
             @Override
             public void update(TargetStage stage, PipelineStatus status) {
                 System.err.printf("\tRunning stage: %s: %s\n", stage, status);
@@ -85,11 +85,15 @@ public class ContinuousIntegrationServer extends AbstractHandler {
             e.printStackTrace();
         }
 
-        if (status != PipelineStatus.Fail) {
+        if (result.status != PipelineStatus.Fail) {
             sendUpdateRequest(event, CommitStatus.SUCCESS, "Pipeline succeeded", null);
         }
 
         System.out.println("Commit status update sent successfully.");
+    }
+
+    private void handleLogRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.getWriter().println("Showing log");
     }
 
     /**
@@ -107,6 +111,13 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         response.setContentType("text/html;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
+
+        var url = request.getRequestURI().split("/");
+
+        if ("log".equals(url[1])) {
+            handleLogRequest(request, response);
+            return;
+        }
 
         var eventType = Optional.ofNullable(request.getHeader("X-GitHub-Event"));
         var body = request.getReader().lines().collect(Collectors.joining());

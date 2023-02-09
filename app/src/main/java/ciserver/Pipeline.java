@@ -1,5 +1,7 @@
 package ciserver;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +27,37 @@ interface PipelineObserver {
 }
 
 interface StageTask {
-    public PipelineStatus execute(String pipelineDir, PushEvent event);
+    public PipelineResult execute(String pipelineDir, PushEvent event);
+}
+
+class PipelineResult {
+    String output = "";
+    PipelineStatus status = PipelineStatus.NotStarted;
+
+    PipelineResult(PipelineStatus status) {
+        this.status = status;
+    }
+
+    PipelineResult(PipelineStatus status, String output) {
+        this.status = status;
+        this.output = output;
+    }
+
+    PipelineResult(PipelineStatus status, Exception e) {
+        var sw = new StringWriter();
+        var pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+
+        this.status = status;
+        this.output = sw.toString();
+    }
+
+    PipelineResult append(String header, PipelineResult result) {
+        this.output += String.format("[%s]\n\n%s\n\n", header, result.output.replaceAll("\n", "\n\t"));
+        this.status = result.status;
+
+        return this;
+    }
 }
 
 /**
@@ -52,10 +84,12 @@ class Pipeline {
      * @param target is what stage the pipeline should target.
      * @return the status of the executed pipeline. OK if everything went ok.
      */
-    public PipelineStatus start(TargetStage target) {
+    public PipelineResult start(TargetStage target) {
+        var result = new PipelineResult(PipelineStatus.NotImplemented);
+
         // No target
         if (target == TargetStage.NONE) {
-            return PipelineStatus.Ok;
+            return result.append("NO TARGET", new PipelineResult(PipelineStatus.Ok));
         }
 
         // The reason status is redeclared in each stage is to prevent accidental usage
@@ -65,11 +99,12 @@ class Pipeline {
         {
             notifyObservers(TargetStage.PULL, PipelineStatus.InProgress);
 
-            var status = puller.execute(pipelineDir, event);
+            var nresult = puller.execute(pipelineDir, event);
+            result = result.append("PULL", nresult);
 
-            notifyObservers(TargetStage.PULL, status);
-            if (status != PipelineStatus.Ok || target == TargetStage.PULL) {
-                return status;
+            notifyObservers(TargetStage.PULL, result.status);
+            if (result.status != PipelineStatus.Ok || target == TargetStage.PULL) {
+                return result;
             }
         }
 
@@ -77,11 +112,11 @@ class Pipeline {
         {
             notifyObservers(TargetStage.LINT, PipelineStatus.InProgress);
 
-            var status = PipelineStatus.Ok;
+            result = result.append("LINT", new PipelineResult(PipelineStatus.Ok));
 
-            notifyObservers(TargetStage.LINT, status);
-            if (status != PipelineStatus.Ok || target == TargetStage.LINT) {
-                return status;
+            notifyObservers(TargetStage.LINT, result.status);
+            if (result.status != PipelineStatus.Ok || target == TargetStage.LINT) {
+                return result;
             }
         }
 
@@ -89,11 +124,12 @@ class Pipeline {
         {
             notifyObservers(TargetStage.COMPILE, PipelineStatus.InProgress);
 
-            var status = compiler.execute(pipelineDir, event);
+            var nresult = compiler.execute(pipelineDir, event);
+            result = result.append("COMPILE", nresult);
 
-            notifyObservers(TargetStage.COMPILE, status);
-            if (status != PipelineStatus.Ok || target == TargetStage.COMPILE) {
-                return status;
+            notifyObservers(TargetStage.COMPILE, result.status);
+            if (result.status != PipelineStatus.Ok || target == TargetStage.COMPILE) {
+                return result;
             }
         }
 
@@ -101,15 +137,16 @@ class Pipeline {
         {
             notifyObservers(TargetStage.TESTING, PipelineStatus.InProgress);
 
-            var status = tester.execute(pipelineDir, event);
+            var nresult = tester.execute(pipelineDir, event);
+            result = result.append("TESTING", nresult);
 
-            notifyObservers(TargetStage.TESTING, status);
-            if (status != PipelineStatus.Ok || target == TargetStage.TESTING) {
-                return status;
+            notifyObservers(TargetStage.TESTING, result.status);
+            if (result.status != PipelineStatus.Ok || target == TargetStage.TESTING) {
+                return result;
             }
         }
 
-        return PipelineStatus.Ok;
+        return result;
     }
 
     /**

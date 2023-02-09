@@ -26,7 +26,7 @@ public class PipelinePuller implements StageTask {
      *
      * @return the status of the pull action
      */
-    public PipelineStatus execute(String pipelineDir, PushEvent event) {
+    public PipelineResult execute(String pipelineDir, PushEvent event) {
         // Use the head_commit id as name for the repository directory
         String directoryPath = String.format("%s/%s/%s", pipelineDir, event.repository.name, event.headCommit.id);
 
@@ -45,13 +45,11 @@ public class PipelinePuller implements StageTask {
                     .call(); // Checkout the commit
 
         } catch (GitAPIException e) {
-            e.printStackTrace();
-            return PipelineStatus.Fail;
+            return new PipelineResult(PipelineStatus.Fail, e);
         } catch (IOException e) {
-            e.printStackTrace();
-            return PipelineStatus.Fail;
+            return new PipelineResult(PipelineStatus.Fail, e);
         }
 
-        return PipelineStatus.Ok;
+        return new PipelineResult(PipelineStatus.Ok);
     }
 }

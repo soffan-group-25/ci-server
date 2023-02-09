@@ -45,8 +45,8 @@ public class ContinuousIntegrationServerTest {
             }
         };
 
-        var status = method.invoke(server, event, pipeline, observer);
-        assertEquals(PipelineStatus.Ok, status);
+        var result = (PipelineResult) method.invoke(server, event, pipeline, observer);
+        assertEquals(PipelineStatus.Ok, result.status);
 
         var expectedUpdates = new ArrayList<Update>();
         expectedUpdates.add(new Update(TargetStage.PULL, PipelineStatus.InProgress));

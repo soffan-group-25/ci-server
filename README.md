@@ -34,6 +34,11 @@ Our team assessment and documentation in accordance to the Essence standard is [
 
 ### Didrik Munther
 
+* Frontend build log
+* Command executer
+* Pulling repository
+* Parse push event from github
+
 ### Hannah Burak
 
 ### Håvard Alstadheim

@@ -12,16 +12,16 @@ import org.apache.commons.io.IOUtils;
  * this class is used for the compile stage of our CI pipeline
  */
 public class PipelineCommandExecuter implements StageTask {
-	public final ArrayList<String> commands = new ArrayList<>();
+    private final ArrayList<String> commands = new ArrayList<>();
 
-	/**
-	 * constructs a PipelineCompiler for running a certain set of commands
-	 *
-	 * @param commands is the command(s) to run
-	 */
-	PipelineCommandExecuter(String... commands) {
-		this.commands.addAll(Arrays.asList(commands));
-	}
+    /**
+     * constructs a PipelineCompiler for running a certain set of commands
+     *
+     * @param commands is the command(s) to run
+     */
+    public PipelineCommandExecuter(String... commands) {
+        this.commands.addAll(Arrays.asList(commands));
+    }
 
 	/**
 	 * Run the specified `commands` in the folder of the pulled repository.

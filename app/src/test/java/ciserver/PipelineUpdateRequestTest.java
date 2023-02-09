@@ -32,10 +32,10 @@ public class PipelineUpdateRequestTest {
     public void PipelineUpdateRequestFail() {
         var dto = getPR();
         dto.state = CommitStatus.FAILURE;
-        dto.failedOn = PipelineStage.COMPILE;
+        dto.failedOn = TargetStage.COMPILE;
         var pr = new PipelineUpdateRequest(dto);
         assert (!pr.failedOn.isEmpty());
-        assertEquals(pr.failedOn.get(), PipelineStage.COMPILE);
+        assertEquals(pr.failedOn.get(), TargetStage.COMPILE);
     }
 
     @Test(expected = NoSuchElementException.class)

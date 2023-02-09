@@ -34,21 +34,23 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     private final String BASE_URL = System.getenv("BASE_URL");
     private final String pipelineDir = "../pipeline";
 
-    private String buildLogURL(PushEvent event, CommitStatus status) {
+    private String buildLogURL(PushEvent event, PipelineStatus plStatus) {
+        // Add trailing slash to base URL if missing and format timestamp
+        String baseURLChecked = BASE_URL + (BASE_URL.charAt(BASE_URL.length()-1) == '/' ? "" : "/");
         String formattedTimestamp = event.headCommit.timestamp.split("T")[0] + "."
-                + event.headCommit.timestamp.split("T")[1].split("+")[0];
+                + event.headCommit.timestamp.split("T")[1].split("\\+")[0];
 
-        return BASE_URL + "log/" + event.repository.full_name.split("/")[1] + "/" + formattedTimestamp + "."
-                + event.headCommit.id + "." + status + ".log";
+        return baseURLChecked + "log/" + event.repository.full_name.split("/")[1] + "/" + formattedTimestamp + "."
+                + event.headCommit.id + "." + plStatus + ".log";
     }
 
-    private void sendUpdateRequest(PushEvent event, CommitStatus status, String description, TargetStage failedOn) {
+    private void sendUpdateRequest(PushEvent event, CommitStatus status, String description, TargetStage failedOn, PipelineStatus plStatus) {
         // Build the response according to the pipeline's return status (dummy variables
         // used here as we have no "real" requests to start the pipeline with yet).
         String[] repoDetails = event.repository.full_name.split("/");
         var dto = new PipelineUpdateRequestDTO(repoDetails[0], repoDetails[1], event.headCommit.id, GH_ACCESS_TOKEN,
                 status,
-                buildLogURL(event, status),
+                buildLogURL(event, plStatus),
                 description, "ci",
                 failedOn);
 
@@ -101,10 +103,10 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
                 if (status == PipelineStatus.Fail) {
                     sendUpdateRequest(event, CommitStatus.FAILURE,
-                            String.format("Failed during stage %s with status %s.", stage, status), stage);
+                            String.format("Failed during stage %s with status %s.", stage, status), stage, status);
                 } else if (status == PipelineStatus.InProgress) {
                     sendUpdateRequest(event, CommitStatus.PENDING,
-                            String.format("Doing stage: %s", stage), stage);
+                            String.format("Doing stage: %s", stage), stage, status);
                 }
 
                 // Add sleeping to every step so we have a chance to show
@@ -124,7 +126,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         }
 
         if (result.status != PipelineStatus.Fail) {
-            sendUpdateRequest(event, CommitStatus.SUCCESS, "Pipeline succeeded", null);
+            sendUpdateRequest(event, CommitStatus.SUCCESS, "Pipeline succeeded", null, result.status);
         }
 
         System.out.println("Commit status update sent successfully.");

@@ -30,19 +30,40 @@ interface StageTask {
     public PipelineResult execute(String pipelineDir, PushEvent event);
 }
 
+/**
+ * a pipeline responsible for sending results for web loging functionality
+ * 
+ */
 class PipelineResult {
     String output = "";
     PipelineStatus status = PipelineStatus.NotStarted;
 
+    /**
+     * status and exception to the web log in a readable format 
+     *
+     * @param status current status of the pipeline
+     */
     PipelineResult(PipelineStatus status) {
         this.status = status;
     }
 
+    /**
+     * status and exception to the web log in a readable format 
+     *
+     * @param status current status of the pipeline
+     * @param output a string of the current output of the pipeline
+     */
     PipelineResult(PipelineStatus status, String output) {
         this.status = status;
         this.output = output;
     }
 
+    /**
+     * status and exception to the web log in a readable format 
+     *
+     * @param status current status of the pipeline
+     * @param e the current exception that is thrown
+     */
     PipelineResult(PipelineStatus status, Exception e) {
         var sw = new StringWriter();
         var pw = new PrintWriter(sw);
@@ -52,6 +73,13 @@ class PipelineResult {
         this.output = sw.toString();
     }
 
+    /**
+     * appends two pipeline results
+     *
+     * @param header is the current header
+     * @param result is a different pipeline result that is to be appended with the current one
+     * @return the last pipeline result follorwed by the result of the curent pipeline result 
+     */
     PipelineResult append(String header, PipelineResult result) {
         this.output += String.format("[%s]\n\n\t%s\n\n", header, result.output.replaceAll("\n", "\n\t"));
         this.status = result.status;

@@ -71,6 +71,7 @@ public class PipelineTest {
 
         var status = pipeline.start(TargetStage.COMPILE);
         assertEquals(PipelineStatus.Ok, status);
+        
 
         File directory = new File(
                 String.format("%s/%s/%s", PipelineTest.PipelineTestingDirectory, event.repository.name,

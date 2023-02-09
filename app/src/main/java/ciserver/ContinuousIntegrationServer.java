@@ -122,7 +122,26 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         logBuild(event, result);
     }
 
+    private void handleSpecificLogRequest(ArrayList<String> url, HttpServletResponse response) throws IOException {
+        File file = new File(String.format("%s/logs/%s", pipelineDir, url.get(2)));
+        if (!file.exists()) {
+            return;
+        }
+
+        var contents = FileUtils.readFileToString(file, "UTF-8");
+        var writer = response.getWriter();
+
+        writer.println(contents);
+
+    }
+
     private void handleLogRequest(ArrayList<String> url, HttpServletResponse response) throws IOException {
+        // We are requesting a specific log
+        if (url.size() >= 3) {
+            handleSpecificLogRequest(url, response);
+            return;
+        }
+
         File dir = new File(String.format("%s/logs", pipelineDir));
         dir.mkdirs();
 
@@ -139,11 +158,9 @@ public class ContinuousIntegrationServer extends AbstractHandler {
             for (var logFile : project.listFiles()) {
                 var logPath = logFile.getPath().split("/");
                 var logName = logPath[logPath.length - 1];
-                var contents = FileUtils.readFileToString(logFile, "UTF-8");
 
                 writer.printf("<li>");
-                writer.printf("<h6>%s</h6>", logName);
-                writer.printf("<pre>%s</pre>", contents);
+                writer.printf("<a href=\"%s/%s\"><h6>%s</h6></a>", projectName, logName, logName);
                 writer.printf("</li>");
             }
             writer.printf("</ul>");

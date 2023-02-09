@@ -12,6 +12,7 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -119,7 +120,21 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         logBuild(event, result);
     }
 
-    private void handleLogRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void handleLogRequest(ArrayList<String> url, HttpServletResponse response) throws IOException {
+        File dir = new File(String.format("%s", pipelineDir));
+        dir.mkdirs();
+
+        var logs = new HashMap<String, ArrayList<File>>();
+
+        for(var project: dir.listFiles()) {
+            File logFile = new File("%s/logs", project.getPath());
+            logFile.mkdirs();
+
+            // logs.put(project.getPath(), null)
+
+            System.err.printf("%s", project.getPath());
+        }
+
         response.getWriter().println("Showing log");
     }
 
@@ -142,7 +157,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         var url = new ArrayList<>(Arrays.asList(request.getRequestURI().split("/")));
 
         if (url.size() >= 1 && "log".equals(url.get(1))) {
-            handleLogRequest(request, response);
+            handleLogRequest(url, response);
             return;
         }
 

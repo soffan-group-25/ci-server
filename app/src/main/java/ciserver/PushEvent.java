@@ -24,6 +24,8 @@ class Commit {
 
     Author author;
 
+    String timestamp;
+
     ArrayList<String> added; // added files
     ArrayList<String> removed; // removed files
     ArrayList<String> modified; // modified files

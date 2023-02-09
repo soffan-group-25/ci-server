@@ -53,7 +53,7 @@ class PipelineResult {
     }
 
     PipelineResult append(String header, PipelineResult result) {
-        this.output += String.format("[%s]\n\n%s\n\n", header, result.output.replaceAll("\n", "\n\t"));
+        this.output += String.format("[%s]\n\n\t%s\n\n", header, result.output.replaceAll("\n", "\n\t"));
         this.status = result.status;
 
         return this;

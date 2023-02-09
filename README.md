@@ -54,4 +54,10 @@ Our team assessment and documentation in accordance to the Essence standard is [
 
 ### Håvard Alstadheim
 
+* Most of the javadoc and related work for the doc requirement
+* Fix correct stages in pipeline, and fix scopes in command executer
+* Add external CI server to repository for live comparison with our own
+* Bureaucracy: documenting issues, mapping issues to assignment ("stakeholder") requirements, catching typos
+* Some inputs on gradle functionality, server administration, github API
+
 ### Pontus Söderlund

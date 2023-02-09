@@ -35,7 +35,7 @@ public class PipelineCommandExecuter implements StageTask {
 	 * @return the status of the compilation action
 	 */
 	public PipelineResult execute(String pipelineDir, PushEvent event) {
-		var path = String.format("%s/%s/%s", pipelineDir, event.repository.name, event.headCommit.id);
+		var path = String.format("%s/repos/%s/%s", pipelineDir, event.repository.name, event.headCommit.id);
 		var directory = new File(path);
 		directory.mkdirs(); // Make the directories recursively
 

@@ -28,7 +28,7 @@ public class PipelinePuller implements StageTask {
      */
     public PipelineResult execute(String pipelineDir, PushEvent event) {
         // Use the head_commit id as name for the repository directory
-        String directoryPath = String.format("%s/%s/%s", pipelineDir, event.repository.name, event.headCommit.id);
+        String directoryPath = String.format("%s/repos/%s/%s", pipelineDir, event.repository.name, event.headCommit.id);
 
         try {
             File directory = new File(directoryPath);

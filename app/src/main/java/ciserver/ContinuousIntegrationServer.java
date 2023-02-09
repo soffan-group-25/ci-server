@@ -4,8 +4,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.http.HttpResponse;
+import java.util.Calendar;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -22,9 +26,9 @@ import com.google.gson.JsonSyntaxException;
  * statuses in GitHub
  */
 public class ContinuousIntegrationServer extends AbstractHandler {
-
     private final Gson gson = new Gson();
     private final String GH_ACCESS_TOKEN = System.getenv("GH_ACCESS_TOKEN");
+    private final String pipelineDir = "../pipeline";
 
     private void sendUpdateRequest(PushEvent event, CommitStatus status, String description, TargetStage failedOn) {
         // Build the response according to the pipeline's return status (dummy variables
@@ -52,10 +56,27 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
     }
 
+    private void logBuild(PushEvent event, PipelineResult result) {
+        try {
+            var fileName = String.format("%s-%s-%s.%s:%s:%s.%s.log", Calendar.getInstance().get(Calendar.YEAR),
+                    Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH),
+                    Calendar.getInstance().get(Calendar.HOUR), Calendar.getInstance().get(Calendar.MINUTE),
+                    Calendar.getInstance().get(Calendar.SECOND), event.headCommit.id);
+            File file = new File(String.format("%s/logs/%s/%s", pipelineDir, event.repository.name, fileName));
+            file.createNewFile();
+
+            var writer = new BufferedWriter(new FileWriter(file));
+            writer.write(result.output);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void handlePushEvent(PushEvent event) {
         System.err.printf("%s, %s", event.ref, event.headCommit.url);
 
-        var pipeline = new Pipeline(event, "../pipeline");
+        var pipeline = new Pipeline(event, pipelineDir);
         var result = executePipeline(event, pipeline, new PipelineObserver() {
             @Override
             public void update(TargetStage stage, PipelineStatus status) {
@@ -90,6 +111,8 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         }
 
         System.out.println("Commit status update sent successfully.");
+
+        logBuild(event, result);
     }
 
     private void handleLogRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {

@@ -64,8 +64,9 @@ public class ContinuousIntegrationServer extends AbstractHandler {
                     Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH),
                     Calendar.getInstance().get(Calendar.HOUR), Calendar.getInstance().get(Calendar.MINUTE),
                     Calendar.getInstance().get(Calendar.SECOND), event.headCommit.id);
+            File dir = new File(String.format("%s/logs/%s", pipelineDir, event.repository.name));
+            dir.mkdirs();
             File file = new File(String.format("%s/logs/%s/%s", pipelineDir, event.repository.name, fileName));
-            file.mkdirs();
             file.createNewFile();
 
             var writer = new BufferedWriter(new FileWriter(file));

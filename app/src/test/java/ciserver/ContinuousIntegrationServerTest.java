@@ -34,8 +34,8 @@ public class ContinuousIntegrationServerTest {
         System.err.println(server.buildLogURL(event, PipelineStatus.Ok));
         System.err.println(expected);
         assert(server.buildLogURL(event, PipelineStatus.Ok).equals( expected));
-        */
 }
+        */
 
     @Test
     public void executePipelineWorks() throws NoSuchMethodException, SecurityException, IllegalAccessException,

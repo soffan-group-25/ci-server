@@ -131,6 +131,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         var contents = FileUtils.readFileToString(file, "UTF-8");
         var writer = response.getWriter();
 
+        writer.printf("<h1>%s</h1>", url.get(3));
         writer.printf("<pre>%s</pre>", contents);
     }
 
@@ -157,7 +158,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
             for (var logFile : project.listFiles()) {
                 var logPath = logFile.getPath().split("/");
                 var logName = logPath[logPath.length - 1];
-                var logComponents = logName.split(".");
+                var logComponents = logName.split("\\.");
                 var logStatus = logComponents[logComponents.length - 2]; // failed, ok
 
                 writer.printf("<li>");

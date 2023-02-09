@@ -23,6 +23,20 @@ public class ContinuousIntegrationServerTest {
         }
     }
 
+    /*
+     * Requires changing the URL builder function to public (didn't get reflection working)
+    @Test
+    public void testURLBuilder() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        var server = new ContinuousIntegrationServer();
+        var event = (new Gson()).fromJson(PushEventTest.TestData, PushEvent.class);
+        String BASE_URL = System.getenv("BASE_URL");
+        String expected =BASE_URL+"/log/ci-test/2023-02-03.13:48:12.2c8db6c6d079f23710da7b1a61d9cb04fb366e04.Ok.log";
+        System.err.println(server.buildLogURL(event, PipelineStatus.Ok));
+        System.err.println(expected);
+        assert(server.buildLogURL(event, PipelineStatus.Ok).equals( expected));
+        */
+}
+
     @Test
     public void executePipelineWorks() throws NoSuchMethodException, SecurityException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {

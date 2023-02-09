@@ -19,6 +19,9 @@ public class PipelineTest {
 
     public static final String PipelineTestingDirectory = "../pipeline_testing";
 
+    /**
+    * Most basic test seeing that the pipeline can execute properly 
+    */
     @Test
     public void canExecutePipeline() {
         var gson = new Gson();
@@ -31,6 +34,10 @@ public class PipelineTest {
         assertNotNull(status);
     }
 
+    /**
+    * Observers are notifed of changes
+    * if no observation is detected the test returns false
+    */
     @Test
     public void pipelineObserverIsNotified() {
         var gson = new Gson();
@@ -53,6 +60,12 @@ public class PipelineTest {
         assertTrue(pipelineObserver.observerIsNotified);
     }
 
+    /**
+    * test to see that needed information is grabbed from the repository
+    * will fail if the code cannot open the git project
+    *
+    *@throws IOException
+    */
     @Test
     public void canPull() throws IOException {
         var gson = new Gson();

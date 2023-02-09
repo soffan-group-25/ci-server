@@ -10,6 +10,10 @@ public class PushEventTest {
 
     Gson gson = new Gson();
 
+    /**
+     * tests that all information from the repository
+     * is read properlly and as expected
+     */
     @Test
     public void parsesPushEvent() {
         var e = gson.fromJson(TestData, PushEvent.class);

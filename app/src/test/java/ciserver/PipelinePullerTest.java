@@ -22,11 +22,11 @@ public class PipelinePullerTest {
         var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
         var pipeline = new Pipeline(event, PipelineTest.PipelineTestingDirectory);
 
-        var status = pipeline.start(TargetStage.PULL);
-        assertEquals(PipelineStatus.Ok, status);
+        var result = pipeline.start(TargetStage.PULL);
+        assertEquals(PipelineStatus.Ok, result.status);
 
         File directory = new File(
-                String.format("%s/%s/%s", PipelineTest.PipelineTestingDirectory, event.repository.name,
+                String.format("%s/repos/%s/%s", PipelineTest.PipelineTestingDirectory, event.repository.name,
                         event.headCommit.id));
         assertTrue(directory.isDirectory());
 

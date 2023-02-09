@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -135,9 +137,9 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
 
-        var url = request.getRequestURI().split("/");
-
-        if ("log".equals(url[1])) {
+        var url = new ArrayList<>(Arrays.asList(request.getRequestURI().split("/")));
+        
+        if ("log".equals(url.get(1))) {
             handleLogRequest(request, response);
             return;
         }

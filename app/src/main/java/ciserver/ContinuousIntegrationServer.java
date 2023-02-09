@@ -34,13 +34,15 @@ public class ContinuousIntegrationServer extends AbstractHandler {
     private final String BASE_URL = System.getenv("BASE_URL");
     private final String pipelineDir = "../pipeline";
 
-    private String buildLogURL(PushEvent event, PipelineStatus plStatus) {
+    public String buildLogURL(PushEvent event, PipelineStatus plStatus) {
         // Add trailing slash to base URL if missing and format timestamp
         String baseURLChecked = BASE_URL + (BASE_URL.charAt(BASE_URL.length() - 1) == '/' ? "" : "/");
         String formattedTimestamp = event.headCommit.timestamp.split("T")[0] + "."
                 + event.headCommit.timestamp.split("T")[1].split("\\+")[0];
+        System.err.println(event.headCommit.timestamp.split("T")[0]);
+        System.err.println(event.headCommit.timestamp.split("T")[1]);
 
-        return baseURLChecked + "log/" + event.repository.full_name.split("/")[1] + "/" + formattedTimestamp + "."
+        return baseURLChecked + "logs/" + event.repository.full_name.split("/")[1] + "/" + formattedTimestamp + "."
                 + event.headCommit.id + "." + plStatus + ".log";
     }
 
@@ -51,7 +53,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
         String[] repoDetails = event.repository.full_name.split("/");
         var dto = new PipelineUpdateRequestDTO(repoDetails[0], repoDetails[1], event.headCommit.id, GH_ACCESS_TOKEN,
                 status,
-                buildLogURL(event, plStatus),
+                BASE_URL + "/logs",
                 description, "ci",
                 failedOn);
 

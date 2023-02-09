@@ -31,14 +31,26 @@ import com.google.gson.JsonSyntaxException;
 public class ContinuousIntegrationServer extends AbstractHandler {
     private final Gson gson = new Gson();
     private final String GH_ACCESS_TOKEN = System.getenv("GH_ACCESS_TOKEN");
+    private final String BASE_URL = System.getenv("BASE_URL");
     private final String pipelineDir = "../pipeline";
+
+    private String buildLogURL(PushEvent event, CommitStatus status) {
+        String formattedTimestamp = event.headCommit.timestamp.split("T")[0] + "."
+                + event.headCommit.timestamp.split("T")[1].split("+")[0];
+
+        return BASE_URL + "log/" + event.repository.full_name.split("/")[1] + "/" + formattedTimestamp + "."
+                + event.headCommit.id + "." + status + ".log";
+    }
 
     private void sendUpdateRequest(PushEvent event, CommitStatus status, String description, TargetStage failedOn) {
         // Build the response according to the pipeline's return status (dummy variables
         // used here as we have no "real" requests to start the pipeline with yet).
         String[] repoDetails = event.repository.full_name.split("/");
         var dto = new PipelineUpdateRequestDTO(repoDetails[0], repoDetails[1], event.headCommit.id, GH_ACCESS_TOKEN,
-                status, "", description, "ci", failedOn);
+                status,
+                buildLogURL(event, status),
+                description, "ci",
+                failedOn);
 
         PipelineUpdateRequest pr = new PipelineUpdateRequest(dto);
 
@@ -221,7 +233,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
     /**
      * Used to start the CI server in command line
-     * 
+     *
      * @throws Exception if the server cannot be started
      */
     public static void startServer() throws Exception {

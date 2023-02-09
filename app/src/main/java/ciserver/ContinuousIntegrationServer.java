@@ -36,7 +36,7 @@ public class ContinuousIntegrationServer extends AbstractHandler {
 
     private String buildLogURL(PushEvent event, PipelineStatus plStatus) {
         // Add trailing slash to base URL if missing and format timestamp
-        String baseURLChecked = BASE_URL + (BASE_URL.charAt(BASE_URL.length()-1) == '/' ? "" : "/");
+        String baseURLChecked = BASE_URL + (BASE_URL.charAt(BASE_URL.length() - 1) == '/' ? "" : "/");
         String formattedTimestamp = event.headCommit.timestamp.split("T")[0] + "."
                 + event.headCommit.timestamp.split("T")[1].split("\\+")[0];
 
@@ -44,7 +44,8 @@ public class ContinuousIntegrationServer extends AbstractHandler {
                 + event.headCommit.id + "." + plStatus + ".log";
     }
 
-    private void sendUpdateRequest(PushEvent event, CommitStatus status, String description, TargetStage failedOn, PipelineStatus plStatus) {
+    private void sendUpdateRequest(PushEvent event, CommitStatus status, String description, TargetStage failedOn,
+            PipelineStatus plStatus) {
         // Build the response according to the pipeline's return status (dummy variables
         // used here as we have no "real" requests to start the pipeline with yet).
         String[] repoDetails = event.repository.full_name.split("/");

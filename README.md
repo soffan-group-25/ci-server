@@ -43,10 +43,32 @@ Our team assessment and documentation in accordance to the Essence standard is [
 
 ### Daniel Williams
 
+* Sending HTTP POST requests
+* Connect commit statuses to web frontend
+* Set up an environment that the server could run in 24/7
+
 ### Didrik Munther
+
+* Frontend build log
+* Command executer
+* Pulling repository
+* Parse push event from github
 
 ### Hannah Burak
 
+* Wrote Essence 
+* Documented code
+* was in contact with TAs for questions 
+* Approved PRs
+
 ### Håvard Alstadheim
 
+* Most of the javadoc and related work for the doc requirement
+* Fix correct stages in pipeline, and fix scopes in command executer
+* Add external CI server to repository for live comparison with our own
+* Bureaucracy: documenting issues, mapping issues to assignment ("stakeholder") requirements, catching typos
+* Some inputs on gradle functionality, server administration, github API
+
 ### Pontus Söderlund
+* Pipeline code structure
+* Code reviews

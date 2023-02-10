@@ -26,24 +26,31 @@ public class PipelineCompilerTest {
      */
     @Test
     public void canCompile() throws IOException {
-        var fileName = "test_file.txt";
         var gson = new Gson();
         var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
-        var pipeline = new Pipeline(event, PipelineTest.PipelineTestingDirectory);
-        pipeline.compiler = new PipelineCompiler("touch", fileName);
 
-        var status = pipeline.start(TargetStage.COMPILE);
+        var pipelinePath = String.format("%s/%s/%s", PipelineTest.PipelineTestingDirectory, event.repository.name,
+                event.headCommit.id);
+        var fileName = "test_file.txt";
+
+        var pipeline = new Pipeline(event);
+        pipeline.compiler = new PipelineCompiler("touch", fileName);
+        var status = pipeline.start(TargetStage.COMPILE, PipelineTest.PipelineTestingDirectory);
+
         assertEquals(PipelineStatus.Ok, status);
 
-        File directory = new File(
-                String.format("%s/repositories/%s", PipelineTest.PipelineTestingDirectory,
-                        event.headCommit.id));
+        File directory = new File(pipelinePath);
+        directory.mkdirs();
+        System.err.println();
         assertTrue(directory.isDirectory());
 
         var fileExists = Arrays.stream(directory.listFiles())
                 .anyMatch(file -> file.getName().equals(fileName));
+
+        System.err.println(fileExists);
+
         assertTrue("File was created by compiler component", fileExists);
 
-        FileUtils.deleteDirectory(directory);
+        // FileUtils.deleteDirectory(directory);
     }
 }

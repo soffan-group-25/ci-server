@@ -26,12 +26,9 @@ public class PipelinePuller implements StageTask {
      *
      * @return the status of the pull action
      */
-    public PipelineStatus execute(String pipelineDir, PushEvent event) {
-        // Use the head_commit id as name for the repository directory
-        String directoryPath = String.format("%s/%s/%s", pipelineDir, event.repository.name, event.headCommit.id);
-
+    public PipelineStatus execute(String pipelinePath, PushEvent event) {
         try {
-            File directory = new File(directoryPath);
+            File directory = new File(pipelinePath);
             directory.mkdirs(); // Make the directories recursively
             FileUtils.deleteDirectory(directory); // If there already is a repository, delete it
 

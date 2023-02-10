@@ -22,12 +22,11 @@ public class PipelineCompiler implements StageTask {
 	 *
 	 * @return the status of the compilation action
 	 */
-	public PipelineStatus execute(String pipelineDir, PushEvent event) {
-		var path = String.format("%s/repositories/%s", pipelineDir, event.headCommit.id);
-		var directory = new File(path);
-		directory.mkdirs(); // Make the directories recursively
-
+	public PipelineStatus execute(String pipelinePath, PushEvent event) {
 		try {
+			var directory = new File(pipelinePath);
+			directory.mkdirs(); // Make the directories recursively
+
 			var process = new ProcessBuilder(commands)
 					.directory(directory)
 					.redirectErrorStream(true)

@@ -5,6 +5,10 @@ package ciserver;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import com.google.gson.Gson;
@@ -14,23 +18,25 @@ public class PipelineTest {
     public static final String PipelineTestingDirectory = "../pipeline_testing";
 
     @Test
-    public void canExecutePipeline() {
+    public void canExecutePipeline() throws IOException {
         var gson = new Gson();
         var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
 
-        var pipeline = new Pipeline(event, "./pipeline");
+        var pipeline = new Pipeline(event);
         assertNotNull(pipeline);
 
-        var status = pipeline.start(TargetStage.ALL);
+        var status = pipeline.start(TargetStage.ALL, PipelineTestingDirectory);
         assertNotNull(status);
+
+        FileUtils.deleteDirectory(new File(PipelineTestingDirectory));
     }
 
     @Test
-    public void pipelineObserverIsNotified() {
+    public void pipelineObserverIsNotified() throws IOException {
         var gson = new Gson();
         var event = gson.fromJson(PushEventTest.TestData, PushEvent.class);
 
-        var pipeline = new Pipeline(event, "./pipeline");
+        var pipeline = new Pipeline(event);
         var pipelineObserver = new PipelineObserver() {
 
             boolean observerIsNotified = false;
@@ -42,8 +48,10 @@ public class PipelineTest {
         };
 
         pipeline.addObserver(pipelineObserver);
-        pipeline.start(TargetStage.ALL);
+        pipeline.start(TargetStage.ALL, PipelineTestingDirectory);
 
         assertTrue(pipelineObserver.observerIsNotified);
+
+        FileUtils.deleteDirectory(new File(PipelineTestingDirectory));
     }
 }

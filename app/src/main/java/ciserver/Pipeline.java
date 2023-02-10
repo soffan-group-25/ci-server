@@ -26,7 +26,7 @@ interface PipelineObserver {
 }
 
 interface StageTask {
-	public PipelineStatus execute(String pipelineDir, PushEvent event);
+	public PipelineStatus execute(String pipelinePath, PushEvent event);
 }
 
 /**
@@ -35,24 +35,24 @@ interface StageTask {
  */
 class Pipeline {
 
-	private final String pipelineDir;
 	private final PushEvent event;
 	private List<PipelineObserver> observers = new ArrayList<PipelineObserver>();
 	PipelinePuller puller = new PipelinePuller();
 	PipelineCompiler compiler = new PipelineCompiler("./gradlew build");
 
-	Pipeline(PushEvent event, String pipelineDir) {
+	Pipeline(PushEvent event) {
 		this.event = event;
-		this.pipelineDir = pipelineDir;
 	}
 
 	/**
 	 * Start the pipeline.
 	 *
-	 * @param target is what stage the pipeline should target.
+	 * @param target       is what stage the pipeline should target.
+	 * @param pipelinePath is the path to the directory (relative to app/) where the
+	 *                     repository should be cloned.
 	 * @return the status of the executed pipeline. OK if everything went ok.
 	 */
-	public PipelineStatus start(TargetStage target) {
+	public PipelineStatus start(TargetStage target, String pipelinePath) {
 		// No target
 		if (target == TargetStage.NONE) {
 			return PipelineStatus.Ok;
@@ -66,7 +66,7 @@ class Pipeline {
 			notifyObservers(TargetStage.PULL, PipelineStatus.InProgress);
 
 			// Code goes here
-			var status = puller.execute(pipelineDir, event);
+			var status = puller.execute(pipelinePath, event);
 
 			notifyObservers(TargetStage.PULL, status);
 			if (status != PipelineStatus.Ok || target == TargetStage.PULL) {
@@ -92,7 +92,7 @@ class Pipeline {
 			notifyObservers(TargetStage.COMPILE, PipelineStatus.InProgress);
 
 			// Code goes here
-			var status = compiler.execute(pipelineDir, event);
+			var status = compiler.execute(pipelinePath, event);
 
 			notifyObservers(TargetStage.COMPILE, status);
 			if (status != PipelineStatus.Ok || target == TargetStage.COMPILE) {

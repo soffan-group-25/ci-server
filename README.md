@@ -56,6 +56,11 @@ Our team assessment and documentation in accordance to the Essence standard is [
 
 ### Hannah Burak
 
+* Wrote Essence 
+* Documented code
+* was in contact with TAs for questions 
+* Approved PRs
+
 ### Håvard Alstadheim
 
 * Most of the javadoc and related work for the doc requirement

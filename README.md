@@ -70,3 +70,5 @@ Our team assessment and documentation in accordance to the Essence standard is [
 * Some inputs on gradle functionality, server administration, github API
 
 ### Pontus Söderlund
+* Pipeline code structure
+* Code reviews
